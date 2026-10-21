@@ -247,6 +247,47 @@ body, header, aside, .surface-card, .sidebar-nav-item,
 .text-rose-600   { color: var(--rose-400) !important; }
 .bg-rose-50      { background-color: var(--rose-100) !important; }
 
+/* Quote Box - Dark Executive Inset (no white glow) */
+.quote-box {
+  background-color: var(--bg-surface) !important;
+  border: 1px solid var(--border-subtle) !important;
+  border-left: 3px solid var(--accent) !important;
+  color: var(--text-primary) !important;
+  font-style: italic;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  font-size: 0.75rem;
+  line-height: 1.5;
+}
+
+/* ProofBox Table Row Highlight - sleek executive tint */
+.proofbox-table-row {
+  background: var(--accent-bg) !important;
+  border-left: 2px solid var(--accent) !important;
+}
+.proofbox-table-row td {
+  color: var(--accent) !important;
+}
+
+/* Global dark-mode guard: ensure Tailwind slash opacity classes match the theme */
+[data-theme="dark"] .bg-white\/80,
+[data-theme="dark"] .bg-white\/90,
+[data-theme="dark"] .bg-white\/95 {
+  background-color: var(--bg-elevated) !important;
+}
+[data-theme="dark"] .bg-slate-50\/50,
+[data-theme="dark"] .bg-slate-50\/60,
+[data-theme="dark"] .bg-slate-50\/80 {
+  background-color: var(--bg-surface) !important;
+}
+[data-theme="dark"] .bg-blue-50\/50,
+[data-theme="dark"] .bg-blue-50\/60 {
+  background-color: var(--accent-bg) !important;
+}
+[data-theme="dark"] .border-blue-200 {
+  border-color: var(--accent-border) !important;
+}
+
 /* ============================================================
    SCROLLBARS
    ============================================================ */
