@@ -1751,12 +1751,12 @@
   <!-- LEGAL AI CHATBOT - Only visible after login (app.js controls) -->
   <!-- ============================================================ -->
 
-  <!-- Floating Toggle Button: starts hidden, shown by showWorkspace() -->
-  <button id="chatbotToggleBtn" onclick="chatbot.toggle()" title="Legal Assistant" aria-label="Open Legal Assistant" class="hidden">
+  <!-- Floating Toggle Button: always starts closed, user clicks to open -->
+  <button id="chatbotToggleBtn" onclick="chatbot.toggle()" title="ProofBox Legal Assistant" aria-label="Open Legal Assistant">
     <i data-lucide="message-circle" class="w-6 h-6" id="chatbotToggleIcon"></i>
   </button>
 
-  <!-- Chatbot Panel: always starts hidden -->
+  <!-- Chatbot Panel: ALWAYS starts hidden; never pops up automatically -->
   <div id="chatbotPanel" class="hidden">
 
     <!-- Panel Header -->
@@ -1766,13 +1766,19 @@
           <i data-lucide="scale" class="w-4 h-4" style="color:var(--accent);"></i>
         </div>
         <div>
-          <div class="text-sm font-bold" style="color:var(--text-primary); font-family:'Playfair Display',serif;">Legal Assistant</div>
-          <div class="text-[10px]" style="color:var(--text-muted);">Evidence guidance - scope limited</div>
+          <div id="chatbotTitle" class="text-sm font-bold" style="color:var(--text-primary); font-family:'Playfair Display',serif;">Legal Assistant</div>
+          <div id="chatbotSubtitle" class="text-[10px]" style="color:var(--text-muted);">Evidence & Dispute Guidance</div>
         </div>
       </div>
       <button onclick="chatbot.toggle()" class="p-1.5 rounded-lg transition" style="color:var(--text-muted);" onmouseover="this.style.background='var(--bg-surface)'" onmouseout="this.style.background='transparent'">
         <i data-lucide="x" class="w-4 h-4"></i>
       </button>
+    </div>
+
+    <!-- Guest Mode Banner (visible only before login) -->
+    <div id="chatbotGuestBanner" class="px-4 py-1.5 flex-shrink-0 flex items-center justify-between text-[11px]" style="background:rgba(42,157,143,0.15); border-bottom:1px solid rgba(42,157,143,0.3); color:var(--accent);">
+      <span><strong>Guest Mode</strong>: General dispute FAQ.</span>
+      <button onclick="app.showAuthModal('login')" class="underline font-bold text-xs hover:opacity-80">Sign In</button>
     </div>
 
     <!-- Disclaimer Banner -->

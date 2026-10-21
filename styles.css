@@ -1671,7 +1671,6 @@ input:-webkit-autofill:focus {
   max-width: calc(100vw - 2rem);
   height: 480px;
   border-radius: 1rem;
-  display: flex;
   flex-direction: column;
   overflow: hidden;
   border: 1px solid var(--border-muted);
@@ -1679,8 +1678,13 @@ input:-webkit-autofill:focus {
   background-color: var(--bg-raised);
 }
 
+#chatbotPanel.hidden {
+  display: none !important;
+}
+
 /* Panel entrance */
 #chatbotPanel:not(.hidden) {
+  display: flex !important;
   animation: chatbot-slide-in 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 @keyframes chatbot-slide-in {

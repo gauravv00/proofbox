@@ -261,12 +261,13 @@ class ProofBoxApp {
       workspace.classList.add('hidden');
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
-    // Hide chatbot when on landing page
-    const chatBtn   = document.getElementById('chatbotToggleBtn');
+    // Close chatbot panel on landing page; keep toggle button available
     const chatPanel = document.getElementById('chatbotPanel');
-    if (chatBtn)   chatBtn.classList.add('hidden');
     if (chatPanel) chatPanel.classList.add('hidden');
-    if (window.chatbot) window.chatbot.isOpen = false;
+    if (window.chatbot) {
+      window.chatbot.isOpen = false;
+      window.chatbot.updateHeader();
+    }
   }
 
   showWorkspace() {
@@ -277,9 +278,9 @@ class ProofBoxApp {
       workspace.classList.remove('hidden');
     }
 
-    // Show chatbot button only when workspace is active (logged in / demo)
-    const chatBtn = document.getElementById('chatbotToggleBtn');
-    if (chatBtn) chatBtn.classList.remove('hidden');
+    if (window.chatbot) {
+      window.chatbot.updateHeader();
+    }
 
     const demoBanner = document.getElementById('demoModeBanner');
     if (demoBanner) {
@@ -2225,7 +2226,11 @@ class ProofBoxChatbot {
 
     if (this.isOpen) {
       panel.classList.remove('hidden');
-      if (!this.initialized) { this.initialized = true; this._renderWelcome(); }
+      this.updateHeader();
+      if (!this.initialized) {
+        this.initialized = true;
+        this._renderWelcome();
+      }
       setTimeout(() => {
         const inp = document.getElementById('chatbotInput');
         if (inp) inp.focus();
@@ -2239,20 +2244,58 @@ class ProofBoxChatbot {
     if (window.lucide) lucide.createIcons();
   }
 
+  updateHeader() {
+    const wsEl = document.getElementById('evidenceAppWorkspace');
+    const isWorkspace = wsEl && !wsEl.classList.contains('hidden');
+    const isAuth = isWorkspace && (window.app && (window.app.user || window.app.isDemoMode));
+    const titleEl = document.getElementById('chatbotTitle');
+    const subEl   = document.getElementById('chatbotSubtitle');
+    const bannerEl = document.getElementById('chatbotGuestBanner');
+
+    if (isAuth) {
+      const activeCase = window.app ? window.app.getActiveCase() : null;
+      if (titleEl) titleEl.textContent = 'Legal Case Assistant';
+      if (subEl) subEl.textContent = activeCase && activeCase.title ? `Active Case: ${activeCase.title}` : 'Case Workspace Mode';
+      if (bannerEl) bannerEl.classList.add('hidden');
+    } else {
+      if (titleEl) titleEl.textContent = 'Quick Legal Assistant';
+      if (subEl) subEl.textContent = 'Guest Mode - General dispute FAQ';
+      if (bannerEl) bannerEl.classList.remove('hidden');
+    }
+  }
+
   _renderWelcome() {
     const c = document.getElementById('chatbotMessages');
     if (!c) return;
-    const suggestions = [
-      'How do I build a strong tenancy dispute case?',
-      'What evidence do I need for an unpaid invoice?',
+    this.updateHeader();
+
+    const wsEl = document.getElementById('evidenceAppWorkspace');
+    const isWorkspace = wsEl && !wsEl.classList.contains('hidden');
+    const isAuth = isWorkspace && (window.app && (window.app.user || window.app.isDemoMode));
+
+    const suggestions = isAuth ? [
+      'How do I structure my evidence timeline?',
+      'Can WhatsApp messages be certified under 65B?',
+      'Draft a formal demand letter outline',
+      'Check for gaps in my evidence file'
+    ] : [
       'Can WhatsApp messages be used as evidence?',
-      'How does Bates numbering work?'
+      'Landlord refusing to refund security deposit',
+      'How to recover an unpaid freelance invoice?',
+      'What is Bates numbering?'
     ];
+
     c.innerHTML = `
       <div class="chatbot-msg-bot">
         <div class="chatbot-bubble-bot">
-          <p style="color:var(--text-primary);">Hello. I am the ProofBox Legal Assistant. I can guide you on evidence collection, tenant rights, consumer disputes, and how to use ProofBox effectively.</p>
-          <p style="color:var(--text-secondary); margin-top:0.5rem;">What would you like to know?</p>
+          <p style="color:var(--text-primary);">
+            ${isAuth
+              ? 'Hello. I am your ProofBox Case Assistant. I can help you structure your evidence timeline, ensure digital record admissibility under Section 65B/BSA 63, review financial claims, and prepare court-ready packets.'
+              : 'Hello. I am the ProofBox Quick Assistant. You can ask me general questions about dispute documentation, tenant rights, unpaid freelance invoices, and evidence standards in India.'}
+          </p>
+          <p style="color:var(--text-secondary); margin-top:0.5rem;">
+            ${isAuth ? 'What aspect of your case shall we review?' : 'What would you like to know?'}
+          </p>
         </div>
       </div>
       <div style="display:flex; flex-wrap:wrap; gap:0.375rem; margin-top:0.5rem;">
