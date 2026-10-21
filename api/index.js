@@ -7,8 +7,9 @@ const fs = require('fs');
 const authRoutes = require('../backend/routes/auth');
 const { router: casesRoutes } = require('../backend/routes/cases');
 const exhibitsRoutes = require('../backend/routes/exhibits');
-const claimsRoutes = require('../backend/routes/claims');
-const exportRoutes = require('../backend/routes/export');
+const claimsRoutes   = require('../backend/routes/claims');
+const exportRoutes   = require('../backend/routes/export');
+const chatRoutes     = require('../backend/routes/chat');
 
 const app = express();
 
@@ -32,6 +33,7 @@ app.use('/api/cases', casesRoutes);
 app.use('/api', exhibitsRoutes);
 app.use('/api', claimsRoutes);
 app.use('/api', exportRoutes);
+app.use('/api/chat', chatRoutes);
 
 // Global error handler
 app.use((err, req, res, next) => {

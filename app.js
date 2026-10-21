@@ -261,6 +261,12 @@ class ProofBoxApp {
       workspace.classList.add('hidden');
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
+    // Hide chatbot when on landing page
+    const chatBtn   = document.getElementById('chatbotToggleBtn');
+    const chatPanel = document.getElementById('chatbotPanel');
+    if (chatBtn)   chatBtn.classList.add('hidden');
+    if (chatPanel) chatPanel.classList.add('hidden');
+    if (window.chatbot) window.chatbot.isOpen = false;
   }
 
   showWorkspace() {
@@ -270,6 +276,10 @@ class ProofBoxApp {
       landing.classList.add('hidden');
       workspace.classList.remove('hidden');
     }
+
+    // Show chatbot button only when workspace is active (logged in / demo)
+    const chatBtn = document.getElementById('chatbotToggleBtn');
+    if (chatBtn) chatBtn.classList.remove('hidden');
 
     const demoBanner = document.getElementById('demoModeBanner');
     if (demoBanner) {
@@ -519,6 +529,14 @@ class ProofBoxApp {
     this.cases = [];
     this.activeCase = null;
     this.activeCaseId = null;
+    // Reset chatbot state
+    if (window.chatbot) {
+      window.chatbot.history = [];
+      window.chatbot.initialized = false;
+      window.chatbot.isOpen = false;
+      const msgs = document.getElementById('chatbotMessages');
+      if (msgs) msgs.innerHTML = '';
+    }
     this.showToast('You have been signed out.', 'info');
     this.showLanding();
   }

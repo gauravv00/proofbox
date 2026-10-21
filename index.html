@@ -1748,15 +1748,15 @@
   <div id="toastContainer"></div>
 
   <!-- ============================================================ -->
-  <!-- LEGAL AI CHATBOT WIDGET                                      -->
+  <!-- LEGAL AI CHATBOT - Only visible after login (app.js controls) -->
   <!-- ============================================================ -->
 
-  <!-- Floating Toggle Button -->
-  <button id="chatbotToggleBtn" onclick="chatbot.toggle()" title="Legal Assistant" aria-label="Open Legal Assistant">
+  <!-- Floating Toggle Button: starts hidden, shown by showWorkspace() -->
+  <button id="chatbotToggleBtn" onclick="chatbot.toggle()" title="Legal Assistant" aria-label="Open Legal Assistant" class="hidden">
     <i data-lucide="message-circle" class="w-6 h-6" id="chatbotToggleIcon"></i>
   </button>
 
-  <!-- Chatbot Panel -->
+  <!-- Chatbot Panel: always starts hidden -->
   <div id="chatbotPanel" class="hidden">
 
     <!-- Panel Header -->

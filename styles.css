@@ -1634,7 +1634,7 @@ input:-webkit-autofill:focus {
    LEGAL AI CHATBOT
    ============================================================ */
 
-/* Floating toggle button pulse on first load */
+/* Floating toggle button - only shown in workspace (controlled by app.js) */
 #chatbotToggleBtn {
   position: fixed;
   bottom: 1.5rem;
@@ -1653,6 +1653,9 @@ input:-webkit-autofill:focus {
   box-shadow: 0 4px 20px var(--teal-glow), 0 2px 8px rgba(0,0,0,0.35);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
+/* Tailwind's 'hidden' class sets display:none - ensure it wins over our fixed positioning */
+#chatbotToggleBtn.hidden { display: none !important; }
+#chatbotToggleBtn:not(.hidden) { display: flex !important; }
 #chatbotToggleBtn:hover {
   transform: scale(1.08);
   box-shadow: 0 6px 28px var(--teal-glow), 0 2px 8px rgba(0,0,0,0.4);
