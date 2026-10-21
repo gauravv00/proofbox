@@ -5,7 +5,8 @@ const { authMiddleware } = require('../middleware/auth');
 const { formatClaim } = require('./cases');
 
 const router = express.Router();
-router.use(authMiddleware);
+// Scope authMiddleware to only case routes, avoiding intercepting other /api endpoints
+router.use('/cases', authMiddleware);
 
 /**
  * GET /api/cases/:caseId/claims

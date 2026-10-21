@@ -9,7 +9,9 @@ const { authMiddleware } = require('../middleware/auth');
 const { formatExhibit } = require('./cases');
 
 const router = express.Router();
-router.use(authMiddleware);
+// Scope authMiddleware to only exhibit & case routes, avoiding intercepting /api/chat or others
+router.use('/cases', authMiddleware);
+router.use('/exhibits', authMiddleware);
 
 // Configure multer storage per case
 const isVercel = process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME;

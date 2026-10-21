@@ -29,11 +29,11 @@ app.get('/api/health', (req, res) => {
 
 // Mount API routes
 app.use('/api/auth', authRoutes);
+app.use('/api/chat', chatRoutes);
 app.use('/api/cases', casesRoutes);
 app.use('/api', exhibitsRoutes);
 app.use('/api', claimsRoutes);
 app.use('/api', exportRoutes);
-app.use('/api/chat', chatRoutes);
 
 // Global error handler
 app.use((err, req, res, next) => {
