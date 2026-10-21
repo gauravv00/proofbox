@@ -1,0 +1,1526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ProofBox - Legal Evidence Organiser</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%232563EB'><path d='M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5'/></svg>">
+
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#EFF6FF',
+              100: '#DBEAFE',
+              500: '#3B82F6',
+              600: '#2563EB',
+              700: '#1D4ED8',
+            }
+          }
+        }
+      }
+    };
+  </script>
+
+  <!-- Google Fonts: Playfair Display (authoritative serif), Plus Jakarta Sans & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600;1,700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen flex flex-col antialiased selection:bg-blue-100 selection:text-blue-900">
+
+  <!-- Top Progress Bar -->
+  <div id="topLoadingProgress"></div>
+
+  <!-- =============================================================== -->
+  <!-- 1. AUTH MODAL (Login & Register)                                -->
+  <!-- =============================================================== -->
+  <div id="authModal" class="hidden auth-overlay">
+    <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-md overflow-hidden relative animate-in fade-in zoom-in duration-200">
+      
+      <!-- Modal Header -->
+      <div class="p-6 pb-4 border-b border-slate-100 flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <img src="assets/logo-dark-trans.png" alt="ProofBox Logo" class="h-8 w-auto logo-img-dark">
+          <img src="assets/logo-light-trans.png" alt="ProofBox Logo" class="h-8 w-auto logo-img-light hidden">
+        </div>
+        <button onclick="app.hideAuthModal()" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg hover:bg-slate-100 transition">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Auth Tabs -->
+      <div class="flex border-b border-slate-200 bg-slate-50/50">
+        <button id="authTabSignIn" onclick="app.switchAuthTab('login')" class="flex-1 py-3 text-xs font-semibold text-center border-b-2 border-blue-600 text-blue-600 bg-white transition">
+          Sign In
+        </button>
+        <button id="authTabSignUp" onclick="app.switchAuthTab('register')" class="flex-1 py-3 text-xs font-semibold text-center border-b-2 border-transparent text-slate-600 hover:text-slate-900 transition">
+          Create Account
+        </button>
+      </div>
+
+      <!-- Auth Content -->
+      <div class="p-6 space-y-4">
+        
+        <!-- Error Alert -->
+        <div id="authErrorMsg" class="hidden p-3 rounded-lg bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2">
+          <i data-lucide="alert-circle" class="w-4 h-4 flex-shrink-0"></i>
+          <span id="authErrorText">Invalid credentials</span>
+        </div>
+
+        <!-- Login Form -->
+        <form id="loginForm" onsubmit="app.submitLogin(event)" class="space-y-4">
+          <div class="text-[11px] text-slate-600 bg-blue-50/60 p-2.5 rounded-lg border border-blue-100 flex items-center justify-between">
+            <span>Demo: <strong class="font-mono text-slate-800">aisha@proofbox.app</strong> / <strong class="font-mono text-slate-800">password123</strong></span>
+            <button type="button" onclick="document.getElementById('loginEmail').value='aisha@proofbox.app'; document.getElementById('loginPassword').value='password123';" class="text-[10px] font-bold text-blue-700 hover:underline">Autofill</button>
+          </div>
+          <div>
+            <label class="form-label" for="loginEmail">Email Address</label>
+            <input id="loginEmail" type="email" required placeholder="name@example.com" class="form-input">
+          </div>
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <label class="form-label mb-0" for="loginPassword">Password</label>
+              <button type="button" onclick="app.showToast('Contact administrator or reset database for dev demo.', 'info')" class="text-[11px] text-blue-600 hover:underline">Forgot password?</button>
+            </div>
+            <input id="loginPassword" type="password" required placeholder="Enter password" class="form-input">
+          </div>
+          <button type="submit" id="loginBtn" class="btn-primary w-full py-2.5 text-sm font-semibold">
+            <span>Sign In</span>
+            <i data-lucide="arrow-right" class="w-4 h-4"></i>
+          </button>
+        </form>
+
+        <!-- Register Form (Hidden by default) -->
+        <form id="registerForm" onsubmit="app.submitRegister(event)" class="hidden space-y-4">
+          <div>
+            <label class="form-label" for="regName">Full Name</label>
+            <input id="regName" type="text" required placeholder="e.g. Aisha Khan" class="form-input">
+          </div>
+          <div>
+            <label class="form-label" for="regEmail">Email Address</label>
+            <input id="regEmail" type="email" required placeholder="name@example.com" class="form-input">
+          </div>
+          <div>
+            <label class="form-label" for="regPassword">Password (6+ characters)</label>
+            <input id="regPassword" type="password" required minlength="6" placeholder="Choose a strong password" class="form-input">
+          </div>
+          <button type="submit" id="registerBtn" class="btn-primary w-full py-2.5 text-sm font-semibold">
+            <span>Create Free Account</span>
+            <i data-lucide="arrow-right" class="w-4 h-4"></i>
+          </button>
+        </form>
+
+        <!-- Divider -->
+        <div class="relative flex items-center justify-center my-4">
+          <div class="border-t border-slate-200 w-full"></div>
+          <span class="bg-white px-3 text-[11px] text-slate-400 font-medium uppercase tracking-wider absolute">Or</span>
+        </div>
+
+        <!-- Try Demo Mode Button -->
+        <button type="button" onclick="app.enterDemoMode()" class="btn-secondary w-full py-2.5 text-xs font-semibold flex items-center justify-center gap-2">
+          <i data-lucide="play-circle" class="w-4 h-4 text-blue-600"></i>
+          <span>Continue in Demo Mode (No account needed)</span>
+        </button>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- =============================================================== -->
+  <!-- 2. SERVICE LANDING PAGE (Clean, Warm, Professional)             -->
+  <!-- =============================================================== -->
+  <div id="serviceLandingPage" class="flex flex-col min-h-screen bg-white">
+    
+    <!-- Navbar -->
+    <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 px-4 lg:px-8 py-3.5 flex items-center justify-between">
+      <div class="flex items-center gap-3 cursor-pointer" onclick="app.scrollToLanding('landingHero')">
+        <img src="assets/logo-dark-trans.png" alt="ProofBox" class="h-8 w-auto logo-img-dark">
+        <img src="assets/logo-light-trans.png" alt="ProofBox" class="h-8 w-auto logo-img-light hidden">
+      </div>
+
+      <!-- Center Links -->
+      <nav class="hidden md:flex items-center gap-8 text-xs font-semibold text-slate-600">
+        <button onclick="app.scrollToLanding('landingSteps')" class="hover:text-blue-600 transition">How It Works</button>
+        <button onclick="app.scrollToLanding('landingCaseStudy')" class="hover:text-blue-600 transition">Case Study</button>
+        <button onclick="app.scrollToLanding('landingDisputes')" class="hover:text-blue-600 transition">Who It is For</button>
+        <button onclick="app.scrollToLanding('landingPricing')" class="hover:text-blue-600 transition">Pricing</button>
+      </nav>
+
+      <!-- Right CTAs -->
+      <div class="flex items-center gap-3">
+        <!-- Theme Toggle Button -->
+        <button id="themeToggleBtn" onclick="app.toggleTheme()" title="Toggle Dark/Light Mode">
+          <i data-lucide="sun" id="iconSun" class="w-4 h-4 hidden"></i>
+          <i data-lucide="moon" id="iconMoon" class="w-4 h-4"></i>
+        </button>
+
+        <button onclick="app.showAuthModal('login')" class="text-xs font-semibold text-slate-700 hover:text-blue-600 px-3 py-1.5 transition">
+          Sign In
+        </button>
+        <button onclick="app.showAuthModal('register')" class="btn-primary text-xs px-4 py-2 flex items-center gap-2">
+          <span>Start Free</span>
+          <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section id="landingHero" class="max-w-5xl mx-auto px-4 sm:px-6 pt-16 sm:pt-24 pb-16 text-center space-y-6">
+      <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-50 border border-blue-200 text-blue-700 text-xs font-semibold">
+        <i data-lucide="shield" class="w-3.5 h-3.5 text-blue-600"></i>
+        <span>TRUSTED EVIDENCE MANAGEMENT</span>
+      </div>
+
+      <h1 class="text-4xl sm:text-6xl font-extrabold tracking-tight text-slate-900 max-w-4xl mx-auto leading-[1.15]">
+        Your evidence, organised. <br>
+        <span class="text-blue-600">Your case, unassailable.</span>
+      </h1>
+
+      <p class="text-base sm:text-lg text-slate-600 max-w-2xl mx-auto leading-relaxed">
+        ProofBox helps ordinary people - tenants, freelancers, consumers - collect, timestamp and organise evidence before it is needed. So when the dispute escalates, you are ready.
+      </p>
+
+      <!-- Two Hero CTAs -->
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-3 pt-4">
+        <button onclick="app.showAuthModal('register')" class="btn-primary text-sm px-6 py-3 w-full sm:w-auto shadow-md">
+          <span>Create My First Case</span>
+          <i data-lucide="arrow-right" class="w-4 h-4"></i>
+        </button>
+        <button onclick="app.enterDemoMode()" class="btn-secondary text-sm px-6 py-3 w-full sm:w-auto">
+          <i data-lucide="play" class="w-4 h-4 text-blue-600"></i>
+          <span>See a Live Demo</span>
+        </button>
+      </div>
+
+      <!-- Trust Bar -->
+      <div class="pt-12 border-t border-slate-100 max-w-3xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-4 text-xs font-medium text-slate-600">
+        <div class="flex items-center justify-center gap-2">
+          <i data-lucide="lock" class="w-4 h-4 text-blue-600"></i>
+          <span>SHA-256 Integrity</span>
+        </div>
+        <div class="flex items-center justify-center gap-2">
+          <i data-lucide="file-check" class="w-4 h-4 text-emerald-600"></i>
+          <span>Chain of Custody Audit</span>
+        </div>
+        <div class="flex items-center justify-center gap-2">
+          <i data-lucide="archive" class="w-4 h-4 text-blue-600"></i>
+          <span>Court-Ready Exports</span>
+        </div>
+        <div class="flex items-center justify-center gap-2">
+          <i data-lucide="user-check" class="w-4 h-4 text-emerald-600"></i>
+          <span>No Legal Knowledge Required</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- How It Works (3 Steps) -->
+    <section id="landingSteps" class="py-16 bg-slate-50 border-y border-slate-200">
+      <div class="max-w-5xl mx-auto px-4 sm:px-6">
+        <div class="text-center max-w-xl mx-auto mb-12">
+          <h2 class="text-xs font-bold text-blue-600 uppercase tracking-wider mb-2">How It Works</h2>
+          <p class="text-2xl font-bold text-slate-900">Three simple steps to dispute readiness</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          
+          <!-- Step 1 -->
+          <div class="surface-card p-6 relative">
+            <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-base mb-4 border border-blue-100">
+              <i data-lucide="upload-cloud" class="w-5 h-5"></i>
+            </div>
+            <div class="text-xs font-bold text-blue-600 uppercase tracking-wider mb-1">Step 1</div>
+            <h3 class="text-lg font-bold text-slate-900 mb-2">Collect</h3>
+            <p class="text-sm text-slate-600 leading-relaxed">
+              Upload files, paste chats, log phone calls. Everything gets timestamped and cryptographically hashed automatically.
+            </p>
+          </div>
+
+          <!-- Step 2 -->
+          <div class="surface-card p-6 relative">
+            <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-base mb-4 border border-blue-100">
+              <i data-lucide="layers" class="w-5 h-5"></i>
+            </div>
+            <div class="text-xs font-bold text-blue-600 uppercase tracking-wider mb-1">Step 2</div>
+            <h3 class="text-lg font-bold text-slate-900 mb-2">Organise</h3>
+            <p class="text-sm text-slate-600 leading-relaxed">
+              ProofBox builds a chronological evidence timeline and assigns legal Bates exhibit numbers to every record.
+            </p>
+          </div>
+
+          <!-- Step 3 -->
+          <div class="surface-card p-6 relative">
+            <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold text-base mb-4 border border-emerald-100">
+              <i data-lucide="download" class="w-5 h-5"></i>
+            </div>
+            <div class="text-xs font-bold text-emerald-600 uppercase tracking-wider mb-1">Step 3</div>
+            <h3 class="text-lg font-bold text-slate-900 mb-2">Export</h3>
+            <p class="text-sm text-slate-600 leading-relaxed">
+              Generate a Court Evidence Pack or Formal Demand Brief with one click. Complete with exhibits and audit manifest.
+            </p>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- Case Study Section -->
+    <section id="landingCaseStudy" class="py-16 max-w-4xl mx-auto px-4 sm:px-6">
+      <div class="surface-card p-8 border-slate-300 shadow-md">
+        <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
+          <div class="flex items-center gap-2">
+            <span class="blue-badge">Tenant Case Study</span>
+            <span class="text-xs text-slate-500 font-mono">Bandra West, Mumbai</span>
+          </div>
+          <span class="emerald-badge">
+            <i data-lucide="check" class="w-3.5 h-3.5"></i>
+            <span>DEPOSIT RECOVERED IN 24 HOURS</span>
+          </span>
+        </div>
+
+        <h3 class="text-2xl font-bold text-slate-900 mb-3">
+          How Aisha recovered her Rs.1,20,000 security deposit
+        </h3>
+
+        <p class="text-sm text-slate-600 leading-relaxed mb-6">
+          When Aisha moved out, the landlord claimed Rs.1,40,000 in damages for ceiling dampness. Using ProofBox, Aisha assembled her lease agreement, initial transfer receipt, 4 contemporaneous WhatsApp chats reporting the monsoon leak within 48 hours, and her out-of-pocket plumber bill. Armed with an irrefutable Bates-stamped timeline, the landlord returned the full deposit within 24 hours without court intervention.
+        </p>
+
+        <div class="flex items-center justify-between border-t border-slate-100 pt-4">
+          <div class="flex items-center gap-6 text-xs text-slate-600 font-mono">
+            <div><span class="font-bold text-slate-900">6</span> exhibits</div>
+            <div><span class="font-bold text-slate-900">Rs.1,20,000</span> recovered</div>
+            <div><span class="font-bold text-slate-900">0</span> legal fees</div>
+          </div>
+          <button onclick="app.enterDemoMode()" class="btn-primary text-xs">
+            <i data-lucide="folder-open" class="w-3.5 h-3.5"></i>
+            <span>Load This Case as Demo</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Who Is This For (4 Dispute Types) -->
+    <section id="landingDisputes" class="py-16 bg-slate-50 border-t border-slate-200">
+      <div class="max-w-5xl mx-auto px-4 sm:px-6">
+        <div class="text-center max-w-xl mx-auto mb-12">
+          <h2 class="text-xs font-bold text-blue-600 uppercase tracking-wider mb-2">Use Cases</h2>
+          <p class="text-2xl font-bold text-slate-900">Built for everyday disputes</p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          
+          <div class="surface-card p-5">
+            <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center mb-3">
+              <i data-lucide="home" class="w-4 h-4"></i>
+            </div>
+            <h4 class="font-bold text-sm text-slate-900 mb-1">Tenant / Landlord</h4>
+            <p class="text-xs text-slate-600">Security deposit withholding, maintenance neglect, unfair eviction notice.</p>
+          </div>
+
+          <div class="surface-card p-5">
+            <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center mb-3">
+              <i data-lucide="briefcase" class="w-4 h-4"></i>
+            </div>
+            <h4 class="font-bold text-sm text-slate-900 mb-1">Freelancer / Contractor</h4>
+            <p class="text-xs text-slate-600">Unpaid invoices, scope creep disputes, delayed client sign-offs.</p>
+          </div>
+
+          <div class="surface-card p-5">
+            <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center mb-3">
+              <i data-lucide="shopping-bag" class="w-4 h-4"></i>
+            </div>
+            <h4 class="font-bold text-sm text-slate-900 mb-1">Consumer Rights</h4>
+            <p class="text-xs text-slate-600">Warranty refusals, defective electronics, missing deliveries and refunds.</p>
+          </div>
+
+          <div class="surface-card p-5">
+            <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center mb-3">
+              <i data-lucide="user-x" class="w-4 h-4"></i>
+            </div>
+            <h4 class="font-bold text-sm text-slate-900 mb-1">Employment</h4>
+            <p class="text-xs text-slate-600">Wrongful termination, unpaid severance, overtime and salary default.</p>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- Pricing (2 Tiers) -->
+    <section id="landingPricing" class="py-16 max-w-4xl mx-auto px-4 sm:px-6">
+      <div class="text-center max-w-xl mx-auto mb-12">
+        <h2 class="text-xs font-bold text-blue-600 uppercase tracking-wider mb-2">Transparent Pricing</h2>
+        <p class="text-2xl font-bold text-slate-900">Start free. Upgrade only when you need unlimited power.</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        
+        <!-- Free Tier -->
+        <div class="surface-card p-6 flex flex-col justify-between">
+          <div>
+            <h3 class="text-base font-bold text-slate-900 mb-1">Free Plan</h3>
+            <p class="text-xs text-slate-500 mb-4">Everything you need to handle a single dispute.</p>
+            <div class="text-3xl font-bold text-slate-900 mb-6">Rs.0 <span class="text-xs font-normal text-slate-500">/ forever</span></div>
+            
+            <ul class="space-y-3 text-xs text-slate-600 mb-6">
+              <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-emerald-600"></i> 1 active dispute case</li>
+              <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-emerald-600"></i> Up to 20 timestamped exhibits</li>
+              <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-emerald-600"></i> SHA-256 integrity verification</li>
+              <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-emerald-600"></i> Basic JSON export</li>
+            </ul>
+          </div>
+          <button onclick="app.showAuthModal('register')" class="btn-secondary w-full text-xs">
+            Start Free
+          </button>
+        </div>
+
+        <!-- Pro Tier -->
+        <div class="surface-card p-6 border-blue-600 shadow-md flex flex-col justify-between relative overflow-hidden">
+          <div class="absolute top-3 right-3">
+            <span class="blue-badge font-bold">RECOMMENDED</span>
+          </div>
+          <div>
+            <h3 class="text-base font-bold text-slate-900 mb-1">Pro Plan</h3>
+            <p class="text-xs text-slate-500 mb-4">For active freelancers and complex claims.</p>
+            <div class="text-3xl font-bold text-blue-600 mb-6">Rs.299 <span class="text-xs font-normal text-slate-500">/ month</span></div>
+
+            <ul class="space-y-3 text-xs text-slate-600 mb-6">
+              <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-blue-600"></i> Unlimited active cases</li>
+              <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-blue-600"></i> Unlimited exhibits & file uploads</li>
+              <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-blue-600"></i> Full Court Evidence ZIP pack</li>
+              <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-blue-600"></i> Formal Demand Brief generator</li>
+              <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-blue-600"></i> Priority email support</li>
+            </ul>
+          </div>
+          <button onclick="app.showAuthModal('register')" class="btn-primary w-full text-xs">
+            Upgrade to Pro
+          </button>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="mt-auto border-t border-slate-200 bg-white py-10 px-4 sm:px-6">
+      <div class="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div class="flex items-center gap-2.5">
+          <img src="assets/logo-dark-trans.png" alt="ProofBox Logo" class="h-6 w-auto logo-img-dark">
+          <img src="assets/logo-light-trans.png" alt="ProofBox Logo" class="h-6 w-auto logo-img-light hidden">
+        </div>
+        <p class="text-xs text-slate-500 text-center sm:text-right max-w-md">
+          ProofBox is evidence organisation software. It does not provide legal advice.
+        </p>
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- =============================================================== -->
+  <!-- 3. APP WORKSPACE (Modern, Fast, API-Connected)                  -->
+  <!-- =============================================================== -->
+  <div id="evidenceAppWorkspace" class="hidden flex-1 flex flex-col h-screen overflow-hidden bg-slate-50">
+    
+    <!-- Demo Mode Notice Banner (Visible only in demo mode) -->
+    <div id="demoModeBanner" class="hidden bg-amber-500 text-white text-xs font-medium px-4 py-1.5 flex items-center justify-between shadow-xs">
+      <div class="flex items-center gap-2">
+        <i data-lucide="info" class="w-4 h-4"></i>
+        <span>You are in Demo Mode. Create a free account to save your evidence to the cloud.</span>
+      </div>
+      <button onclick="app.showAuthModal('register')" class="bg-white text-amber-800 px-2.5 py-0.5 rounded text-[11px] font-bold hover:bg-amber-50 transition">
+        Create Account
+      </button>
+    </div>
+
+    <!-- Header Bar (Slim 56px) -->
+    <header class="h-14 bg-white border-b border-slate-200 px-4 flex items-center justify-between flex-shrink-0 z-30">
+      
+      <!-- Left: Logo & Home -->
+      <div class="flex items-center gap-3">
+        <div onclick="app.showLanding()" class="flex items-center gap-2 cursor-pointer hover:opacity-85 transition">
+          <img src="assets/logo-dark-trans.png" alt="ProofBox" class="h-7 w-auto logo-img-dark">
+          <img src="assets/logo-light-trans.png" alt="ProofBox" class="h-7 w-auto logo-img-light hidden">
+        </div>
+
+        <div class="h-4 w-px bg-slate-200 mx-1"></div>
+
+        <!-- Case Switcher Trigger -->
+        <div class="relative">
+          <button id="caseSelectorBtn" onclick="app.toggleCaseDropdown()" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg border border-slate-200 hover:border-slate-300 bg-slate-50 text-xs font-semibold text-slate-800 transition max-w-[240px]">
+            <span id="headerCaseTitle" class="truncate">Select Case</span>
+            <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-slate-400 flex-shrink-0"></i>
+          </button>
+
+          <!-- Case Switcher Dropdown Menu -->
+          <div id="caseDropdownMenu" class="hidden absolute top-full left-0 mt-1 w-72 bg-white rounded-xl shadow-xl border border-slate-200 p-2 z-50">
+            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-2 py-1">Your Cases</div>
+            <div id="caseListContainer" class="max-h-60 overflow-y-auto space-y-1 mb-2">
+              <!-- Rendered dynamically -->
+            </div>
+            <div class="border-t border-slate-100 pt-2 flex flex-col gap-1">
+              <button onclick="app.openNewCaseModal()" class="btn-primary w-full py-1.5 text-xs">
+                <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                <span>Create New Case</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Center: Offline / Sync Status -->
+      <div id="connectionStatusIndicator" class="hidden items-center gap-1.5 text-xs text-slate-500 font-mono">
+        <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block"></span>
+        <span class="hidden md:inline">API Connected</span>
+      </div>
+
+      <!-- Right: User Actions -->
+      <div class="flex items-center gap-2">
+        <button onclick="app.switchView('ingest')" class="btn-primary py-1.5 px-3 text-xs flex items-center gap-1.5">
+          <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i>
+          <span class="hidden sm:inline">Add Evidence</span>
+        </button>
+
+        <!-- Theme Toggle Button in Workspace -->
+        <button id="themeToggleBtnWorkspace" onclick="app.toggleTheme()" title="Toggle Dark/Light Mode" class="p-1.5 rounded-lg border border-slate-200 hover:bg-slate-100 transition text-slate-600">
+          <i data-lucide="sun" class="w-4 h-4 hidden" id="iconSunWorkspace"></i>
+          <i data-lucide="moon" class="w-4 h-4" id="iconMoonWorkspace"></i>
+        </button>
+
+        <button onclick="app.downloadZipExport()" title="Download Full Case ZIP" class="btn-secondary py-1.5 px-2.5 text-xs">
+          <i data-lucide="archive" class="w-3.5 h-3.5 text-slate-600"></i>
+        </button>
+
+        <!-- User Menu / Logout -->
+        <div class="flex items-center gap-2 pl-2 border-l border-slate-200">
+          <div class="w-7 h-7 rounded-full bg-slate-100 border border-slate-300 text-slate-700 flex items-center justify-center font-bold text-xs uppercase" id="userAvatar">
+            U
+          </div>
+          <span id="userNameDisplay" class="text-xs font-semibold text-slate-700 hidden lg:inline max-w-[120px] truncate">User</span>
+          <button onclick="app.logout()" title="Sign Out" class="text-slate-400 hover:text-rose-600 p-1.5 rounded-lg hover:bg-slate-100 transition">
+            <i data-lucide="log-out" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Sub-header Meta Status Bar -->
+    <div id="subHeaderStatusBar" class="bg-white border-b border-slate-200 px-4 py-2.5 flex flex-wrap items-center justify-between text-xs flex-shrink-0 gap-2">
+      <div class="flex items-center gap-2 flex-wrap">
+        <span id="metaDisputeType" class="blue-badge font-medium">Dispute</span>
+        <span id="metaStatusBadge" class="slate-badge">Active File</span>
+        <span id="metaBatesPrefix" class="bates-tag">PB-</span>
+        <span class="text-slate-400">•</span>
+        <span id="metaOpposingParty" class="text-slate-300 truncate max-w-xs font-medium">Opposing Party</span>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <div class="flex items-center gap-1.5 font-mono">
+          <span class="text-slate-400">Claim:</span>
+          <span id="metaClaimAmount" class="font-bold financial-value text-sm">₹0.00</span>
+        </div>
+        <button onclick="app.openEditCaseModal()" title="Edit Case Info" class="text-slate-400 hover:text-blue-400 p-1 rounded hover:bg-slate-800 transition">
+          <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Workspace Body (Sidebar + Main Content) -->
+    <div class="flex-1 flex overflow-hidden">
+      
+      <!-- Sidebar (240px) -->
+      <aside class="w-60 bg-white border-r border-slate-200 flex flex-col justify-between flex-shrink-0 select-none">
+        
+        <!-- Navigation Links -->
+        <div class="p-3 space-y-1">
+          <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-3 py-1">Workspace</div>
+
+          <div onclick="app.switchView('dashboard')" data-nav="dashboard" class="sidebar-nav-item active">
+            <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+            <span>Dashboard</span>
+          </div>
+
+          <div onclick="app.switchView('timeline')" data-nav="timeline" class="sidebar-nav-item">
+            <i data-lucide="git-commit" class="w-4 h-4"></i>
+            <span>Evidence Timeline</span>
+          </div>
+
+          <div onclick="app.switchView('ingest')" data-nav="ingest" class="sidebar-nav-item">
+            <i data-lucide="plus-circle" class="w-4 h-4"></i>
+            <span>Add Evidence</span>
+          </div>
+
+          <div onclick="app.switchView('vault')" data-nav="vault" class="sidebar-nav-item">
+            <i data-lucide="folder-lock" class="w-4 h-4"></i>
+            <span>Document Vault</span>
+          </div>
+
+          <div onclick="app.switchView('claims')" data-nav="claims" class="sidebar-nav-item">
+            <i data-lucide="calculator" class="w-4 h-4"></i>
+            <span>Damages & Claims</span>
+          </div>
+
+          <div class="pt-3 pb-1">
+            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-3">Resolution</div>
+          </div>
+
+          <div onclick="app.switchView('generator')" data-nav="generator" class="sidebar-nav-item">
+            <i data-lucide="file-text" class="w-4 h-4"></i>
+            <span>Evidence Pack</span>
+          </div>
+
+          <div onclick="app.switchView('audit')" data-nav="audit" class="sidebar-nav-item">
+            <i data-lucide="shield-check" class="w-4 h-4"></i>
+            <span>Audit Log</span>
+          </div>
+
+          <div onclick="app.switchView('gaps')" data-nav="gaps" class="sidebar-nav-item">
+            <i data-lucide="check-square" class="w-4 h-4"></i>
+            <span>Gap Analysis</span>
+          </div>
+        </div>
+
+        <!-- Sidebar Footer -->
+        <div class="p-3 border-t border-slate-200 bg-slate-50/50 space-y-2">
+          <div class="surface-card p-2.5 flex items-center justify-between">
+            <div>
+              <div class="text-[11px] font-bold text-slate-800" id="sidebarPlanName">Free Plan</div>
+              <div class="text-[10px] text-slate-500" id="sidebarExhibitUsage">0 / 20 exhibits</div>
+            </div>
+            <button onclick="app.showLanding()" class="text-slate-400 hover:text-slate-600 p-1">
+              <i data-lucide="help-circle" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+
+      </aside>
+
+      <!-- Main Content Scrollable Area -->
+      <main id="mainContent" class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 space-y-6">
+        
+        <!-- VIEW: DASHBOARD -->
+        <div id="view-dashboard" class="space-y-6">
+          
+          <!-- Compact Metrics Row -->
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            
+            <div class="surface-card p-4">
+              <div class="flex items-center justify-between text-slate-500 mb-1">
+                <span class="text-xs font-semibold">Total Exhibits</span>
+                <i data-lucide="file-text" class="w-4 h-4 text-blue-600"></i>
+              </div>
+              <div class="text-2xl font-extrabold text-slate-900 font-mono" id="dashTotalExhibits">0</div>
+              <div class="text-[11px] text-slate-500 mt-0.5">Bates indexed</div>
+            </div>
+
+            <div class="surface-card p-4">
+              <div class="flex items-center justify-between text-slate-500 mb-1">
+                <span class="text-xs font-semibold">Timeline Span</span>
+                <i data-lucide="calendar" class="w-4 h-4 text-blue-600"></i>
+              </div>
+              <div class="text-2xl font-extrabold text-slate-900" id="dashTimelineSpan">0 days</div>
+              <div class="text-[11px] text-slate-500 mt-0.5" id="dashSpanDates">No dates logged</div>
+            </div>
+
+            <div class="surface-card p-4">
+              <div class="flex items-center justify-between text-slate-500 mb-1">
+                <span class="text-xs font-semibold">Claims Total</span>
+                <i data-lucide="receipt" class="w-4 h-4 text-emerald-600"></i>
+              </div>
+              <div class="text-2xl font-extrabold text-slate-900 font-mono" id="dashClaimsTotal">₹0.00</div>
+              <div class="text-[11px] text-emerald-600 font-medium mt-0.5" id="dashClaimsCount">0 items logged</div>
+            </div>
+
+            <div class="surface-card p-4">
+              <div class="flex items-center justify-between text-slate-500 mb-1">
+                <span class="text-xs font-semibold">Readiness Score</span>
+                <i data-lucide="shield-check" class="w-4 h-4 text-emerald-600"></i>
+              </div>
+              <div class="text-2xl font-extrabold text-emerald-600" id="dashReadinessScore">0%</div>
+              <div class="text-[11px] text-slate-500 mt-0.5">Evidentiary strength</div>
+            </div>
+
+          </div>
+
+          <!-- Two Columns: Readiness Checklist & Recent Stream -->
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            
+            <!-- Left: Evidentiary Readiness Checklist -->
+            <div class="surface-card p-5 space-y-4">
+              <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                <div>
+                  <h3 class="text-sm font-bold text-slate-900">Evidentiary Readiness</h3>
+                  <p class="text-xs text-slate-500">Key proof types needed for this dispute</p>
+                </div>
+                <button onclick="app.switchView('gaps')" class="text-xs font-semibold text-blue-600 hover:underline">
+                  Full Gap Analysis
+                </button>
+              </div>
+
+              <!-- Progress bar -->
+              <div class="space-y-1.5">
+                <div class="flex items-center justify-between text-xs">
+                  <span class="font-medium text-slate-700">Checklist Progress</span>
+                  <span class="font-bold text-slate-900" id="dashProgressLabel">0 / 5</span>
+                </div>
+                <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+                  <div id="dashProgressBar" class="bg-blue-600 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                </div>
+              </div>
+
+              <!-- Checklist items container -->
+              <div id="dashChecklistItems" class="space-y-2 pt-1">
+                <!-- Injected dynamically -->
+              </div>
+            </div>
+
+            <!-- Right: Recent Evidence Stream -->
+            <div class="surface-card p-5 space-y-4">
+              <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                <div>
+                  <h3 class="text-sm font-bold text-slate-900">Recent Evidence Stream</h3>
+                  <p class="text-xs text-slate-500">Last chronologically logged items</p>
+                </div>
+                <button onclick="app.switchView('timeline')" class="text-xs font-semibold text-blue-600 hover:underline">
+                  View Timeline
+                </button>
+              </div>
+
+              <div id="dashRecentStream" class="space-y-2.5">
+                <!-- Injected dynamically -->
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Bottom: Case Summary & Financial Claim Snapshot -->
+          <div class="surface-card p-5 space-y-3">
+            <div class="flex items-center justify-between">
+              <h3 class="text-sm font-bold text-slate-900">Dispute Background & Notes</h3>
+              <button onclick="app.openEditCaseModal()" class="btn-ghost text-xs py-1 px-2">
+                <i data-lucide="edit" class="w-3.5 h-3.5"></i>
+                <span>Edit Details</span>
+              </button>
+            </div>
+            <p id="dashCaseDescription" class="text-xs text-slate-600 leading-relaxed">
+              No description added yet.
+            </p>
+            <div class="bg-slate-50 p-3 rounded-lg border border-slate-200">
+              <div class="text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">Key Case Strategy</div>
+              <p id="dashCaseNotes" class="text-xs text-slate-600">No notes recorded.</p>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- VIEW: EVIDENCE TIMELINE -->
+        <div id="view-timeline" class="hidden space-y-6">
+          
+          <!-- Filters & Actions Bar -->
+          <div class="surface-card p-4 space-y-3">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              
+              <!-- Search Box -->
+              <div class="relative flex-1 max-w-md">
+                <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+                <input id="timelineSearchInput" oninput="app.filterTimeline()" type="text" placeholder="Search title, sender, notes, hash..." class="form-input pl-9 text-xs">
+              </div>
+
+              <!-- Right Tools -->
+              <div class="flex items-center gap-2">
+                <button onclick="app.toggleTimelineSort()" class="btn-secondary text-xs py-1.5 px-3 flex items-center gap-1.5">
+                  <i data-lucide="arrow-up-down" class="w-3.5 h-3.5"></i>
+                  <span id="sortOrderLabel">Oldest First</span>
+                </button>
+                <button onclick="app.switchView('ingest')" class="btn-primary text-xs py-1.5 px-3">
+                  <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                  <span>Add Evidence</span>
+                </button>
+              </div>
+
+            </div>
+
+            <!-- Category Pills -->
+            <div class="flex flex-wrap gap-1.5 pt-1 border-t border-slate-100">
+              <button onclick="app.filterCategory('all')" data-cat="all" class="timeline-filter-pill active px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200">All</button>
+              <button onclick="app.filterCategory('Agreement')" data-cat="Agreement" class="timeline-filter-pill px-2.5 py-1 rounded-full text-xs font-medium text-slate-600 hover:bg-slate-100 border border-transparent">Agreements</button>
+              <button onclick="app.filterCategory('Payment')" data-cat="Payment" class="timeline-filter-pill px-2.5 py-1 rounded-full text-xs font-medium text-slate-600 hover:bg-slate-100 border border-transparent">Payments</button>
+              <button onclick="app.filterCategory('Damage Photo')" data-cat="Damage Photo" class="timeline-filter-pill px-2.5 py-1 rounded-full text-xs font-medium text-slate-600 hover:bg-slate-100 border border-transparent">Damage Photos</button>
+              <button onclick="app.filterCategory('Communication')" data-cat="Communication" class="timeline-filter-pill px-2.5 py-1 rounded-full text-xs font-medium text-slate-600 hover:bg-slate-100 border border-transparent">Communications</button>
+              <button onclick="app.filterCategory('Notice')" data-cat="Notice" class="timeline-filter-pill px-2.5 py-1 rounded-full text-xs font-medium text-slate-600 hover:bg-slate-100 border border-transparent">Notices</button>
+            </div>
+          </div>
+
+          <!-- Vertical Timeline Stream -->
+          <div id="timelineContainer" class="timeline-container space-y-4">
+            <!-- Injected dynamically -->
+          </div>
+
+        </div>
+
+        <!-- VIEW: ADD EVIDENCE (INGEST) -->
+        <div id="view-ingest" class="hidden space-y-6">
+          
+          <div class="border-b border-slate-200 pb-4">
+            <h2 class="text-xl font-bold text-slate-900">Add Evidence</h2>
+            <p class="text-xs text-slate-500">Every item is automatically timestamped, assigned a legal Bates number, and hashed with SHA-256.</p>
+          </div>
+
+          <!-- 4 Method Selection Cards -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            
+            <button onclick="app.switchIngestTab('file')" id="ingestCard-file" class="ingest-method-card surface-card p-4 text-left border-blue-600 bg-blue-50/20 transition">
+              <div class="w-8 h-8 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center mb-2">
+                <i data-lucide="file-up" class="w-4 h-4"></i>
+              </div>
+              <div class="text-xs font-bold text-slate-900">File Upload</div>
+              <div class="text-[11px] text-slate-500">Photos, PDFs, receipts, agreements</div>
+            </button>
+
+            <button onclick="app.switchIngestTab('chat')" id="ingestCard-chat" class="ingest-method-card surface-card p-4 text-left transition hover:border-slate-300">
+              <div class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center mb-2">
+                <i data-lucide="message-square" class="w-4 h-4"></i>
+              </div>
+              <div class="text-xs font-bold text-slate-900">WhatsApp Chat</div>
+              <div class="text-[11px] text-slate-500">Paste raw exported chat messages</div>
+            </button>
+
+            <button onclick="app.switchIngestTab('email')" id="ingestCard-email" class="ingest-method-card surface-card p-4 text-left transition hover:border-slate-300">
+              <div class="w-8 h-8 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center mb-2">
+                <i data-lucide="mail" class="w-4 h-4"></i>
+              </div>
+              <div class="text-xs font-bold text-slate-900">Email Thread</div>
+              <div class="text-[11px] text-slate-500">Paste headers, dates, and message body</div>
+            </button>
+
+            <button onclick="app.switchIngestTab('verbal')" id="ingestCard-verbal" class="ingest-method-card surface-card p-4 text-left transition hover:border-slate-300">
+              <div class="w-8 h-8 rounded-lg bg-purple-100 text-purple-700 flex items-center justify-center mb-2">
+                <i data-lucide="phone-call" class="w-4 h-4"></i>
+              </div>
+              <div class="text-xs font-bold text-slate-900">Verbal Note / Call</div>
+              <div class="text-[11px] text-slate-500">Log phone calls or verbal promises</div>
+            </button>
+
+          </div>
+
+          <!-- Method 1 Form: File Upload -->
+          <div id="ingestPanel-file" class="surface-card p-6 space-y-4">
+            <h3 class="text-sm font-bold text-slate-900">Upload Digital Evidence</h3>
+            
+            <!-- Drag and Drop Dropzone -->
+            <div id="dropzoneArea" class="border-2 border-dashed border-slate-300 hover:border-blue-500 rounded-xl p-8 text-center cursor-pointer transition bg-slate-50/50 hover:bg-blue-50/30">
+              <div class="w-12 h-12 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center mx-auto mb-3">
+                <i data-lucide="upload" class="w-6 h-6"></i>
+              </div>
+              <div class="text-sm font-bold text-slate-800 mb-1">Click to browse or drag and drop files here</div>
+              <p class="text-xs text-slate-500 max-w-sm mx-auto">Supports JPG, PNG, PDF, EML, TXT files up to 50MB. Cryptographic SHA-256 hash is computed on ingestion.</p>
+              <input id="fileUploadInput" type="file" onchange="app.handleFileInput(this.files)" class="hidden">
+            </div>
+
+            <!-- Staged File Details Form (Populated once a file is chosen) -->
+            <form id="fileStagedForm" onsubmit="app.submitStagedFile(event)" class="hidden space-y-4 pt-4 border-t border-slate-100">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label class="form-label">Exhibit Title</label>
+                  <input id="stagedTitle" type="text" required class="form-input">
+                </div>
+                <div>
+                  <label class="form-label">Category</label>
+                  <select id="stagedCategory" class="form-input">
+                    <option value="Agreement">Agreement / Contract</option>
+                    <option value="Payment">Payment / Bank Receipt</option>
+                    <option value="Damage Photo">Damage Photo / Video</option>
+                    <option value="Communication">Communication / Chat</option>
+                    <option value="Notice">Notice / Letter</option>
+                    <option value="Document">General Document</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                  <label class="form-label">Timestamp Date & Time</label>
+                  <input id="stagedTimestamp" type="datetime-local" class="form-input">
+                </div>
+                <div>
+                  <label class="form-label">Sender / Originator</label>
+                  <input id="stagedSender" type="text" placeholder="e.g. Aisha Khan" class="form-input">
+                </div>
+                <div>
+                  <label class="form-label">Recipient</label>
+                  <input id="stagedRecipient" type="text" placeholder="e.g. Vikas Malhotra" class="form-input">
+                </div>
+              </div>
+
+              <div>
+                <label class="form-label">Summary & Context</label>
+                <textarea id="stagedSummary" rows="2" placeholder="Explain what this evidence shows..." class="form-input"></textarea>
+              </div>
+
+              <div>
+                <label class="form-label">Legal Relevance (Why does this prove your claim?)</label>
+                <input id="stagedRelevance" type="text" placeholder="e.g. Proves landlord acknowledged water leak within 48 hours" class="form-input">
+              </div>
+
+              <div class="flex items-center justify-end gap-3 pt-2">
+                <button type="button" onclick="app.cancelStagedFile()" class="btn-secondary text-xs">Cancel</button>
+                <button type="submit" id="stagedSubmitBtn" class="btn-primary text-xs">
+                  <i data-lucide="check" class="w-3.5 h-3.5"></i>
+                  <span>Confirm & Assign Bates Number</span>
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Method 2 Form: WhatsApp Chat Parser -->
+          <div id="ingestPanel-chat" class="hidden surface-card p-6 space-y-4">
+            <div class="flex items-center justify-between">
+              <div>
+                <h3 class="text-sm font-bold text-slate-900">Parse WhatsApp Chat Export</h3>
+                <p class="text-xs text-slate-500">Paste your exported chat. ProofBox parses dates, senders, and converts each critical message into a separate timestamped exhibit.</p>
+              </div>
+              <button type="button" onclick="app.loadSampleChat()" class="btn-ghost text-xs text-blue-600">
+                <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
+                <span>Load Sample Transcript</span>
+              </button>
+            </div>
+
+            <div>
+              <label class="form-label">Paste Raw Chat Transcript</label>
+              <textarea id="chatTranscriptInput" rows="6" placeholder="Paste WhatsApp messages here, e.g.&#10;14/10/25, 09:15 - Aisha: Hi Vikas, the bedroom ceiling has started flaking after yesterday's rain.&#10;14/10/25, 11:20 - Vikas: OK, will send the plumber tomorrow." class="form-input font-mono text-xs"></textarea>
+            </div>
+
+            <div class="flex items-center justify-between">
+              <span id="chatParseCount" class="text-xs text-slate-500 font-medium">0 messages detected</span>
+              <button type="button" onclick="app.parseChatTranscript()" class="btn-primary text-xs">
+                <i data-lucide="cpu" class="w-3.5 h-3.5"></i>
+                <span>Parse Messages</span>
+              </button>
+            </div>
+
+            <!-- Parsed Chat Review & Batch Ingestion Table -->
+            <div id="parsedChatReview" class="hidden pt-4 border-t border-slate-100 space-y-3">
+              <div class="flex items-center justify-between">
+                <h4 class="text-xs font-bold text-slate-900">Parsed Exhibits Preview</h4>
+                <button type="button" onclick="app.batchImportParsedChat()" id="batchImportBtn" class="btn-primary text-xs bg-emerald-600 hover:bg-emerald-700">
+                  <i data-lucide="check-check" class="w-3.5 h-3.5"></i>
+                  <span>Import All to Timeline</span>
+                </button>
+              </div>
+              <div id="parsedChatList" class="space-y-2 max-h-60 overflow-y-auto pr-1">
+                <!-- Injected dynamically -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Method 3 Form: Email Thread -->
+          <div id="ingestPanel-email" class="hidden surface-card p-6 space-y-4">
+            <h3 class="text-sm font-bold text-slate-900">Log Email Communication</h3>
+            <form onsubmit="app.submitEmailNote(event)" class="space-y-4">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label class="form-label">Subject Line</label>
+                  <input id="emailSubject" type="text" required placeholder="e.g. Notice of Defective Ceiling - Apt 4B" class="form-input">
+                </div>
+                <div>
+                  <label class="form-label">Date & Time Sent</label>
+                  <input id="emailTimestamp" type="datetime-local" class="form-input">
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label class="form-label">From (Sender)</label>
+                  <input id="emailFrom" type="text" placeholder="sender@example.com" class="form-input">
+                </div>
+                <div>
+                  <label class="form-label">To (Recipient)</label>
+                  <input id="emailTo" type="text" placeholder="recipient@example.com" class="form-input">
+                </div>
+              </div>
+
+              <div>
+                <label class="form-label">Email Body & Thread Contents</label>
+                <textarea id="emailBody" rows="4" required placeholder="Paste email text here..." class="form-input text-xs"></textarea>
+              </div>
+
+              <div>
+                <label class="form-label">Legal Relevance</label>
+                <input id="emailRelevance" type="text" placeholder="e.g. Establishes formal written notice was delivered on this date." class="form-input">
+              </div>
+
+              <div class="flex justify-end">
+                <button type="submit" class="btn-primary text-xs">
+                  <span>Save Email Exhibit</span>
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Method 4 Form: Verbal Note / Phone Call -->
+          <div id="ingestPanel-verbal" class="hidden surface-card p-6 space-y-4">
+            <div class="flex items-center justify-between">
+              <div>
+                <h3 class="text-sm font-bold text-slate-900">Contemporaneous Phone Call Log</h3>
+                <p class="text-xs text-slate-500">Under evidence rules, a memo recorded immediately after a conversation carries substantial weight.</p>
+              </div>
+              <button type="button" onclick="app.loadSampleVerbal()" class="btn-ghost text-xs text-blue-600">
+                <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
+                <span>Load Sample Call Log</span>
+              </button>
+            </div>
+
+            <form onsubmit="app.submitVerbalNote(event)" class="space-y-4">
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                  <label class="form-label">Call / Meeting Date & Time</label>
+                  <input id="verbalTimestamp" type="datetime-local" class="form-input">
+                </div>
+                <div>
+                  <label class="form-label">Caller / Speaker</label>
+                  <input id="verbalSpeaker" type="text" required placeholder="e.g. Vikas Malhotra (Landlord)" class="form-input">
+                </div>
+                <div>
+                  <label class="form-label">Call Duration</label>
+                  <input id="verbalDuration" type="text" placeholder="e.g. 4 mins 12 secs" class="form-input">
+                </div>
+              </div>
+
+              <div>
+                <label class="form-label">What Was Said & Agreed</label>
+                <textarea id="verbalSummary" rows="3" required placeholder="Describe what both parties stated and any verbal authorizations..." class="form-input text-xs"></textarea>
+              </div>
+
+              <div>
+                <label class="form-label">Legal Relevance</label>
+                <input id="verbalRelevance" type="text" placeholder="e.g. Landlord gave express oral authorization to call plumber immediately." class="form-input">
+              </div>
+
+              <div class="flex justify-end">
+                <button type="submit" class="btn-primary text-xs">
+                  <span>Log Verbal Exhibit</span>
+                </button>
+              </div>
+            </form>
+          </div>
+
+        </div>
+
+        <!-- VIEW: DOCUMENT VAULT -->
+        <div id="view-vault" class="hidden space-y-6">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-4">
+            <div>
+              <h2 class="text-xl font-bold text-slate-900">Document Vault</h2>
+              <p class="text-xs text-slate-500">Encrypted evidence repository with SHA-256 integrity checksums.</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <button onclick="app.downloadZipExport()" class="btn-secondary text-xs">
+                <i data-lucide="download-cloud" class="w-3.5 h-3.5"></i>
+                <span>Download All Files (.zip)</span>
+              </button>
+              <button onclick="app.switchView('ingest')" class="btn-primary text-xs">
+                <i data-lucide="upload" class="w-3.5 h-3.5"></i>
+                <span>Upload File</span>
+              </button>
+            </div>
+          </div>
+
+          <div id="vaultGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <!-- Injected dynamically -->
+          </div>
+        </div>
+
+        <!-- VIEW: DAMAGES & CLAIMS -->
+        <div id="view-claims" class="hidden space-y-6">
+          
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-4">
+            <div>
+              <h2 class="text-xl font-bold text-slate-900">Damages & Financial Claims</h2>
+              <p class="text-xs text-slate-500">Itemize your financial demand and link every rupee to supporting evidence.</p>
+            </div>
+            <button onclick="app.openAddClaimModal()" class="btn-primary text-xs">
+              <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+              <span>Add Claim Item</span>
+            </button>
+          </div>
+
+          <!-- Claims Financial Snapshot Cards -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            
+            <div class="surface-card p-4">
+              <div class="text-xs font-semibold text-slate-500 mb-1">Gross Principal Claims</div>
+              <div class="text-2xl font-bold text-slate-900 font-mono" id="claimsGrossTotal">₹0.00</div>
+              <div class="text-[11px] text-slate-500 mt-0.5">Deposit & damages claimed</div>
+            </div>
+
+            <div class="surface-card p-4">
+              <div class="text-xs font-semibold text-slate-500 mb-1">Disputed Opposing Deductions</div>
+              <div class="text-2xl font-bold text-rose-600 font-mono" id="claimsDeductionsTotal">₹0.00</div>
+              <div class="text-[11px] text-slate-500 mt-0.5">Counter-claims challenged</div>
+            </div>
+
+            <div class="surface-card p-4 border-emerald-500 bg-emerald-50/20">
+              <div class="text-xs font-semibold text-emerald-800 mb-1">Net Demand Amount</div>
+              <div class="text-2xl font-bold text-emerald-700 font-mono" id="claimsNetTotal">₹0.00</div>
+              <div class="text-[11px] text-emerald-600 mt-0.5">Total payable by opponent</div>
+            </div>
+
+          </div>
+
+          <!-- Claims Item Table -->
+          <div class="surface-card overflow-hidden">
+            <div class="p-4 border-b border-slate-200 flex items-center justify-between">
+              <h3 class="text-sm font-bold text-slate-900">Itemized Financial Schedule</h3>
+              <span id="claimsCountBadge" class="text-xs font-mono text-slate-500">0 items</span>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs">
+                <thead class="bg-slate-50 border-b border-slate-200 text-slate-600 font-semibold uppercase tracking-wider text-[10px]">
+                  <tr>
+                    <th class="py-3 px-4">Item Title</th>
+                    <th class="py-3 px-4">Category</th>
+                    <th class="py-3 px-4">Date</th>
+                    <th class="py-3 px-4">Supporting Evidence</th>
+                    <th class="py-3 px-4 text-right">Amount</th>
+                    <th class="py-3 px-4 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="claimsTableBody" class="divide-y divide-slate-100">
+                  <!-- Injected dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- VIEW: EVIDENCE PACK & DEMAND BRIEF (GENERATOR) -->
+        <div id="view-generator" class="hidden space-y-6">
+          
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-4">
+            <div>
+              <h2 class="text-xl font-bold text-slate-900">Evidence Pack & Demand Brief</h2>
+              <p class="text-xs text-slate-500">Automated court-ready exhibits list and formal demand brief generated from your timeline.</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <button onclick="app.downloadJsonExport()" class="btn-secondary text-xs">
+                <i data-lucide="code" class="w-3.5 h-3.5"></i>
+                <span>Download JSON</span>
+              </button>
+              <button onclick="app.downloadZipExport()" class="btn-primary text-xs">
+                <i data-lucide="archive" class="w-3.5 h-3.5"></i>
+                <span>Download Court ZIP Pack</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Document Preview Tabs -->
+          <div class="flex border-b border-slate-200">
+            <button id="packTabBrief" onclick="app.switchPackTab('brief')" class="px-4 py-2.5 text-xs font-bold border-b-2 border-blue-600 text-blue-600 bg-white transition">
+              Formal Demand Brief
+            </button>
+            <button id="packTabIndex" onclick="app.switchPackTab('index')" class="px-4 py-2.5 text-xs font-semibold border-b-2 border-transparent text-slate-600 hover:text-slate-900 transition">
+              Court Exhibit Index (Bates List)
+            </button>
+          </div>
+
+          <!-- Tab 1: Formal Demand Brief Letter -->
+          <div id="packPanelBrief" class="surface-card p-8 font-serif space-y-6 text-sm text-slate-800 leading-relaxed max-w-4xl mx-auto shadow-md">
+            <!-- Rendered dynamically -->
+          </div>
+
+          <!-- Tab 2: Legal Exhibit Index Table -->
+          <div id="packPanelIndex" class="hidden surface-card overflow-hidden">
+            <div class="p-4 border-b border-slate-200 flex items-center justify-between">
+              <h3 class="text-sm font-bold text-slate-900">Court Exhibit Index</h3>
+              <button onclick="window.print()" class="btn-secondary text-xs">
+                <i data-lucide="printer" class="w-3.5 h-3.5"></i>
+                <span>Print Index</span>
+              </button>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs">
+                <thead class="bg-slate-50 border-b border-slate-200 text-slate-600 font-semibold uppercase tracking-wider text-[10px]">
+                  <tr>
+                    <th class="py-3 px-4">Bates No.</th>
+                    <th class="py-3 px-4">Date / Time</th>
+                    <th class="py-3 px-4">Exhibit Description</th>
+                    <th class="py-3 px-4">Source / Type</th>
+                    <th class="py-3 px-4">SHA-256 Hash</th>
+                    <th class="py-3 px-4">Legal Relevance</th>
+                  </tr>
+                </thead>
+                <tbody id="packTableBody" class="divide-y divide-slate-100 font-sans">
+                  <!-- Injected dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- VIEW: AUDIT LOG -->
+        <div id="view-audit" class="hidden space-y-6">
+          <div class="border-b border-slate-200 pb-4">
+            <h2 class="text-xl font-bold text-slate-900">Cryptographic Audit & Custody Chain</h2>
+            <p class="text-xs text-slate-500">Every exhibit is indexed with an immutable SHA-256 cryptographic digest to prove integrity in court or mediation.</p>
+          </div>
+
+          <div class="surface-card p-5 space-y-3">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <i data-lucide="shield-check" class="w-5 h-5 text-emerald-600"></i>
+                <h3 class="text-sm font-bold text-slate-900">Chain of Custody Verification</h3>
+              </div>
+              <span class="emerald-badge">ALL HASHES VERIFIED</span>
+            </div>
+            <p class="text-xs text-slate-600 leading-relaxed">
+              In accordance with legal evidentiary standards, digital evidence must demonstrate that it has not been altered, manipulated, or fabricated post-dispute. ProofBox records cryptographic hash fingerprints for each file upon upload.
+            </p>
+          </div>
+
+          <div class="surface-card overflow-hidden">
+            <div class="p-4 border-b border-slate-200">
+              <h3 class="text-sm font-bold text-slate-900">Evidence Integrity Ledger</h3>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs">
+                <thead class="bg-slate-50 border-b border-slate-200 text-slate-600 font-semibold uppercase tracking-wider text-[10px]">
+                  <tr>
+                    <th class="py-3 px-4">Bates Stamp</th>
+                    <th class="py-3 px-4">Exhibit Title</th>
+                    <th class="py-3 px-4">Timestamp</th>
+                    <th class="py-3 px-4">SHA-256 Hash Fingerprint</th>
+                    <th class="py-3 px-4 text-center">Status</th>
+                  </tr>
+                </thead>
+                <tbody id="auditTableBody" class="divide-y divide-slate-100">
+                  <!-- Injected dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- VIEW: GAP ANALYSIS -->
+        <div id="view-gaps" class="hidden space-y-6">
+          <div class="border-b border-slate-200 pb-4">
+            <h2 class="text-xl font-bold text-slate-900">Evidentiary Gap Analysis</h2>
+            <p class="text-xs text-slate-500">Identify holes in your case before opposing counsel or the mediator does.</p>
+          </div>
+
+          <div id="gapsContainer" class="space-y-4">
+            <!-- Injected dynamically -->
+          </div>
+        </div>
+
+      </main>
+
+    </div>
+
+  </div>
+
+  <!-- =============================================================== -->
+  <!-- 4. MODALS & DRAWERS                                             -->
+  <!-- =============================================================== -->
+
+  <!-- EXHIBIT DETAIL DRAWER -->
+  <div id="exhibitDrawer" class="hidden fixed inset-0 z-50 overflow-hidden">
+    <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-xs transition-opacity" onclick="app.closeExhibitDrawer()"></div>
+    <div class="absolute inset-y-0 right-0 max-w-full flex pl-10">
+      <div class="w-screen max-w-lg bg-white shadow-2xl border-l border-slate-200 flex flex-col justify-between">
+        
+        <!-- Drawer Header -->
+        <div class="p-5 border-b border-slate-200 flex items-center justify-between bg-slate-50/50">
+          <div class="flex items-center gap-2">
+            <span id="drawerBates" class="bates-tag">PB-0001</span>
+            <span id="drawerCategory" class="emerald-badge">Document</span>
+          </div>
+          <button onclick="app.closeExhibitDrawer()" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg hover:bg-slate-100">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+
+        <!-- Drawer Scrollable Content -->
+        <div class="flex-1 overflow-y-auto p-6 space-y-5">
+          <div>
+            <h3 id="drawerTitle" class="text-lg font-bold text-slate-900 mb-1">Exhibit Title</h3>
+            <div class="text-xs text-slate-500 flex items-center gap-2">
+              <i data-lucide="clock" class="w-3.5 h-3.5"></i>
+              <span id="drawerTimestamp">2026-01-15</span>
+            </div>
+          </div>
+
+          <!-- Preview Area -->
+          <div id="drawerPreviewArea" class="bg-slate-50 border border-slate-200 rounded-xl p-4 text-xs font-mono">
+            <!-- Dynamic preview -->
+          </div>
+
+          <!-- Parties -->
+          <div class="grid grid-cols-2 gap-3 bg-slate-50 p-3 rounded-lg border border-slate-200 text-xs">
+            <div>
+              <span class="text-slate-400 block text-[10px] uppercase font-bold">Sender / Originator</span>
+              <span id="drawerSender" class="font-semibold text-slate-800">Aisha Khan</span>
+            </div>
+            <div>
+              <span class="text-slate-400 block text-[10px] uppercase font-bold">Recipient</span>
+              <span id="drawerRecipient" class="font-semibold text-slate-800">Vikas Malhotra</span>
+            </div>
+          </div>
+
+          <!-- Summary & Relevance -->
+          <div class="space-y-3">
+            <div>
+              <h4 class="text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Summary & Content</h4>
+              <p id="drawerSummary" class="text-xs text-slate-600 bg-white p-3 rounded-lg border border-slate-200 leading-relaxed"></p>
+            </div>
+
+            <div>
+              <h4 class="text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Legal Evidentiary Relevance</h4>
+              <p id="drawerRelevance" class="text-xs text-slate-600 bg-blue-50/50 p-3 rounded-lg border border-blue-200 leading-relaxed text-blue-900"></p>
+            </div>
+          </div>
+
+          <!-- Integrity Checksum -->
+          <div class="space-y-1">
+            <h4 class="text-xs font-bold text-slate-700 uppercase tracking-wider">Cryptographic Hash (SHA-256)</h4>
+            <div class="bg-slate-100 p-2.5 rounded-lg border border-slate-200 flex items-center justify-between text-[11px] font-mono text-slate-700 break-all">
+              <span id="drawerHash" class="truncate pr-2">e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855</span>
+              <button onclick="app.copyDrawerHash()" title="Copy SHA-256" class="p-1 hover:text-blue-600 text-slate-500">
+                <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Drawer Footer Actions -->
+        <div class="p-4 border-t border-slate-200 bg-slate-50/50 flex items-center justify-between">
+          <button onclick="app.deleteActiveDrawerExhibit()" class="btn-danger text-xs py-1.5 px-3">
+            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+            <span>Delete</span>
+          </button>
+          <div class="flex items-center gap-2">
+            <a id="drawerFileDownloadLink" href="#" target="_blank" class="btn-secondary text-xs py-1.5 px-3">
+              <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+              <span>View Raw File</span>
+            </a>
+            <button onclick="app.closeExhibitDrawer()" class="btn-primary text-xs py-1.5 px-4">
+              <span>Done</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- NEW CASE MODAL -->
+  <div id="newCaseModal" class="hidden auth-overlay">
+    <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-lg overflow-hidden animate-in fade-in zoom-in duration-200">
+      <div class="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+        <h3 class="text-sm font-bold text-slate-900">Create New Dispute Case</h3>
+        <button onclick="app.closeNewCaseModal()" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <form onsubmit="app.submitNewCase(event)" class="p-6 space-y-4">
+        <div>
+          <label class="form-label" for="newCaseTitle">Case Title *</label>
+          <input id="newCaseTitle" type="text" required placeholder="e.g. Landlord Security Deposit Dispute" class="form-input">
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="form-label" for="newCaseType">Dispute Category</label>
+            <select id="newCaseType" class="form-input">
+              <option value="Tenant / Landlord Deposit">Tenant / Landlord Deposit</option>
+              <option value="Contractor / Payment Default">Freelancer / Payment Default</option>
+              <option value="Consumer Protection / Warranty">Consumer Rights / Warranty</option>
+              <option value="General Dispute">General Civil Dispute</option>
+            </select>
+          </div>
+          <div>
+            <label class="form-label" for="newCasePrefix">Bates Number Prefix</label>
+            <input id="newCasePrefix" type="text" value="PB-" class="form-input font-mono">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="form-label" for="newCaseOpposing">Opposing Party Name</label>
+            <input id="newCaseOpposing" type="text" placeholder="e.g. Landlord or Client Name" class="form-input">
+          </div>
+          <div>
+            <label class="form-label" for="newCaseAmount">Claim Amount</label>
+            <input id="newCaseAmount" type="text" placeholder="e.g. ₹1,20,000" class="form-input">
+          </div>
+        </div>
+
+        <div>
+          <label class="form-label" for="newCaseDesc">Brief Description</label>
+          <textarea id="newCaseDesc" rows="3" placeholder="Explain what happened in 2-3 sentences..." class="form-input"></textarea>
+        </div>
+
+        <div class="flex justify-end gap-2 pt-2 border-t border-slate-100">
+          <button type="button" onclick="app.closeNewCaseModal()" class="btn-secondary text-xs">Cancel</button>
+          <button type="submit" class="btn-primary text-xs">Create Case</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- EDIT CASE MODAL -->
+  <div id="editCaseModal" class="hidden auth-overlay">
+    <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-lg overflow-hidden animate-in fade-in zoom-in duration-200">
+      <div class="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+        <h3 class="text-sm font-bold text-slate-900">Edit Case Details</h3>
+        <button onclick="app.closeEditCaseModal()" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <form onsubmit="app.submitEditCase(event)" class="p-6 space-y-4">
+        <div>
+          <label class="form-label" for="editCaseTitle">Case Title</label>
+          <input id="editCaseTitle" type="text" required class="form-input">
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="form-label" for="editCaseType">Dispute Category</label>
+            <select id="editCaseType" class="form-input">
+              <option value="Tenant / Landlord Deposit">Tenant / Landlord Deposit</option>
+              <option value="Contractor / Payment Default">Freelancer / Payment Default</option>
+              <option value="Consumer Protection / Warranty">Consumer Rights / Warranty</option>
+              <option value="General Dispute">General Civil Dispute</option>
+            </select>
+          </div>
+          <div>
+            <label class="form-label" for="editCaseStatus">File Status</label>
+            <select id="editCaseStatus" class="form-input">
+              <option value="Active Preparation">Active Preparation</option>
+              <option value="Demand Notice Sent">Demand Notice Sent</option>
+              <option value="In Mediation">In Mediation</option>
+              <option value="Resolved / Recovered">Resolved / Recovered</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="form-label" for="editCaseOpposing">Opposing Party Name</label>
+            <input id="editCaseOpposing" type="text" class="form-input">
+          </div>
+          <div>
+            <label class="form-label" for="editCaseAmount">Claim Amount</label>
+            <input id="editCaseAmount" type="text" class="form-input">
+          </div>
+        </div>
+
+        <div>
+          <label class="form-label" for="editCaseDesc">Dispute Summary</label>
+          <textarea id="editCaseDesc" rows="2" class="form-input"></textarea>
+        </div>
+
+        <div>
+          <label class="form-label" for="editCaseNotes">Case Strategy Notes</label>
+          <textarea id="editCaseNotes" rows="2" class="form-input"></textarea>
+        </div>
+
+        <div class="flex items-center justify-between pt-2 border-t border-slate-100">
+          <button type="button" onclick="app.deleteActiveCase()" class="btn-danger text-xs py-1.5 px-3">
+            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+            <span>Delete Case</span>
+          </button>
+          <div class="flex gap-2">
+            <button type="button" onclick="app.closeEditCaseModal()" class="btn-secondary text-xs">Cancel</button>
+            <button type="submit" class="btn-primary text-xs">Save Changes</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ADD CLAIM MODAL -->
+  <div id="addClaimModal" class="hidden auth-overlay">
+    <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200">
+      <div class="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+        <h3 class="text-sm font-bold text-slate-900">Add Financial Claim Item</h3>
+        <button onclick="app.closeAddClaimModal()" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <form onsubmit="app.submitNewClaim(event)" class="p-6 space-y-4">
+        <div>
+          <label class="form-label" for="claimTitle">Claim Title</label>
+          <input id="claimTitle" type="text" required placeholder="e.g. Refund of Security Deposit" class="form-input">
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="form-label" for="claimAmount">Amount (Rs.)</label>
+            <input id="claimAmount" type="number" step="0.01" required placeholder="120000" class="form-input font-mono">
+          </div>
+          <div>
+            <label class="form-label" for="claimCategory">Category</label>
+            <select id="claimCategory" class="form-input">
+              <option value="Principal Deposit">Principal Deposit</option>
+              <option value="Unpaid Invoice">Unpaid Invoice</option>
+              <option value="Out-of-Pocket Mitigation">Out-of-Pocket Mitigation</option>
+              <option value="Disputed Deduction">Disputed Deduction (Deduction)</option>
+              <option value="Late Penalty">Late Penalty / Interest</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="form-label" for="claimDate">Date Due / Incurred</label>
+            <input id="claimDate" type="date" class="form-input">
+          </div>
+          <div>
+            <label class="form-label" for="claimLinkedExhibit">Supporting Exhibit</label>
+            <select id="claimLinkedExhibit" class="form-input">
+              <option value="">No linked exhibit</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <input id="claimIsDeduction" type="checkbox" class="rounded border-slate-300 text-blue-600 focus:ring-blue-500">
+          <label for="claimIsDeduction" class="text-xs text-slate-700">This is an unjustified opposing deduction (negative)</label>
+        </div>
+
+        <div>
+          <label class="form-label" for="claimNotes">Explanation & Notes</label>
+          <textarea id="claimNotes" rows="2" placeholder="Why is this amount owed?" class="form-input text-xs"></textarea>
+        </div>
+
+        <div class="flex justify-end gap-2 pt-2 border-t border-slate-100">
+          <button type="button" onclick="app.closeAddClaimModal()" class="btn-secondary text-xs">Cancel</button>
+          <button type="submit" class="btn-primary text-xs">Save Claim</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toastContainer"></div>
+
+  <!-- Application Logic Scripts -->
+  <script src="data.js"></script>
+  <script src="api.js"></script>
+  <script src="app.js"></script>
+
+</body>
+</html>
