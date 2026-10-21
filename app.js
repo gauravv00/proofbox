@@ -309,7 +309,45 @@ class ProofBoxApp {
     }, 50);
   }
 
+  /* ================= RESPONSIVE MOBILE NAVIGATION ================= */
+
+  toggleMobileNav() {
+    const menu = document.getElementById('mobileNavMenu');
+    const icon = document.getElementById('mobileNavIcon');
+    if (menu) {
+      menu.classList.toggle('hidden');
+      const isHidden = menu.classList.contains('hidden');
+      if (icon) {
+        icon.setAttribute('data-lucide', isHidden ? 'menu' : 'x');
+        if (window.lucide) lucide.createIcons();
+      }
+    }
+  }
+
+  toggleMobileSidebar() {
+    const sidebar = document.getElementById('workspaceSidebar');
+    const backdrop = document.getElementById('mobileSidebarBackdrop');
+    if (sidebar) {
+      const isClosed = sidebar.classList.contains('-translate-x-full');
+      if (isClosed) {
+        sidebar.classList.remove('-translate-x-full');
+        if (backdrop) backdrop.classList.remove('hidden');
+      } else {
+        sidebar.classList.add('-translate-x-full');
+        if (backdrop) backdrop.classList.add('hidden');
+      }
+    }
+  }
+
+  closeMobileSidebar() {
+    const sidebar = document.getElementById('workspaceSidebar');
+    const backdrop = document.getElementById('mobileSidebarBackdrop');
+    if (sidebar) sidebar.classList.add('-translate-x-full');
+    if (backdrop) backdrop.classList.add('hidden');
+  }
+
   switchView(viewName) {
+    this.closeMobileSidebar();
     this.activeView = viewName;
     const views = ['dashboard', 'timeline', 'ingest', 'vault', 'claims', 'generator', 'audit', 'gaps'];
     

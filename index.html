@@ -159,6 +159,11 @@
 
       <!-- Right CTAs -->
       <div class="flex items-center gap-3">
+        <!-- Mobile Hamburger Menu Button -->
+        <button id="mobileNavToggleBtn" onclick="app.toggleMobileNav()" title="Open Navigation Menu" class="md:hidden p-1.5 rounded-lg border border-slate-200 hover:bg-slate-100 transition text-slate-600 flex items-center justify-center">
+          <i data-lucide="menu" id="mobileNavIcon" class="w-5 h-5"></i>
+        </button>
+
         <!-- Theme Toggle Button -->
         <button id="themeToggleBtn" onclick="app.toggleTheme()" title="Toggle Dark/Light Mode">
           <i data-lucide="sun" id="iconSun" class="w-4 h-4 hidden"></i>
@@ -174,6 +179,14 @@
         </button>
       </div>
     </header>
+
+    <!-- Mobile Dropdown Navigation Menu -->
+    <div id="mobileNavMenu" class="hidden md:hidden border-b border-slate-200 bg-white/95 backdrop-blur-md px-4 py-3 space-y-2 z-30 transition-all duration-200">
+      <button onclick="app.scrollToLanding('landingSteps'); app.toggleMobileNav();" class="block w-full text-left py-2 px-3 rounded-lg text-sm font-semibold text-slate-700 hover:bg-slate-100 transition">How It Works</button>
+      <button onclick="app.scrollToLanding('landingCaseStudy'); app.toggleMobileNav();" class="block w-full text-left py-2 px-3 rounded-lg text-sm font-semibold text-slate-700 hover:bg-slate-100 transition">Case Study</button>
+      <button onclick="app.scrollToLanding('landingDisputes'); app.toggleMobileNav();" class="block w-full text-left py-2 px-3 rounded-lg text-sm font-semibold text-slate-700 hover:bg-slate-100 transition">Who It is For</button>
+      <button onclick="app.scrollToLanding('landingPricing'); app.toggleMobileNav();" class="block w-full text-left py-2 px-3 rounded-lg text-sm font-semibold text-slate-700 hover:bg-slate-100 transition">Pricing</button>
+    </div>
 
     <!-- Hero Section -->
     <section id="landingHero" class="max-w-5xl mx-auto px-4 sm:px-6 pt-16 sm:pt-24 pb-16 text-center space-y-6">
@@ -442,10 +455,15 @@
     </div>
 
     <!-- Header Bar (Slim 56px) -->
-    <header class="h-14 bg-white border-b border-slate-200 px-4 flex items-center justify-between flex-shrink-0 z-30">
+    <header class="h-14 bg-white border-b border-slate-200 px-3 sm:px-4 flex items-center justify-between flex-shrink-0 z-30">
       
-      <!-- Left: Logo & Home -->
-      <div class="flex items-center gap-3">
+      <!-- Left: Mobile Menu Toggle + Logo & Home -->
+      <div class="flex items-center gap-2 sm:gap-3">
+        <!-- Sidebar Toggle for Mobile Devices -->
+        <button id="mobileSidebarToggleBtn" onclick="app.toggleMobileSidebar()" title="Toggle Sidebar Navigation" class="md:hidden p-1.5 rounded-lg border border-slate-200 hover:bg-slate-100 transition text-slate-600 flex items-center justify-center">
+          <i data-lucide="menu" class="w-4 h-4"></i>
+        </button>
+
         <div onclick="app.showLanding()" class="flex items-center gap-2 cursor-pointer hover:opacity-85 transition">
           <img src="assets/logo-dark-trans.png" alt="ProofBox" class="h-7 w-auto logo-img-dark">
           <img src="assets/logo-light-trans.png" alt="ProofBox" class="h-7 w-auto logo-img-light hidden">
@@ -455,7 +473,7 @@
 
         <!-- Case Switcher Trigger -->
         <div class="relative">
-          <button id="caseSelectorBtn" onclick="app.toggleCaseDropdown()" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg border border-slate-200 hover:border-slate-300 bg-slate-50 text-xs font-semibold text-slate-800 transition max-w-[240px]">
+          <button id="caseSelectorBtn" onclick="app.toggleCaseDropdown()" class="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-2.5 py-1.5 rounded-lg border border-slate-200 hover:border-slate-300 bg-slate-50 text-xs font-semibold text-slate-800 transition max-w-[140px] sm:max-w-[200px] md:max-w-[240px]">
             <span id="headerCaseTitle" class="truncate">Select Case</span>
             <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-slate-400 flex-shrink-0"></i>
           </button>
@@ -534,14 +552,22 @@
     </div>
 
     <!-- Workspace Body (Sidebar + Main Content) -->
-    <div class="flex-1 flex overflow-hidden">
+    <div class="flex-1 flex overflow-hidden relative">
       
-      <!-- Sidebar (240px) -->
-      <aside class="w-60 bg-white border-r border-slate-200 flex flex-col justify-between flex-shrink-0 select-none">
+      <!-- Mobile Sidebar Backdrop Overlay -->
+      <div id="mobileSidebarBackdrop" onclick="app.closeMobileSidebar()" class="hidden md:hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-40 transition-opacity"></div>
+
+      <!-- Sidebar (240px desktop, sliding drawer on mobile) -->
+      <aside id="workspaceSidebar" class="w-60 bg-white border-r border-slate-200 flex flex-col justify-between flex-shrink-0 select-none fixed md:static inset-y-0 left-0 z-40 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out">
         
         <!-- Navigation Links -->
-        <div class="p-3 space-y-1">
-          <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-3 py-1">Workspace</div>
+        <div class="p-3 space-y-1 overflow-y-auto">
+          <div class="flex items-center justify-between px-3 py-1">
+            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Workspace</div>
+            <button onclick="app.closeMobileSidebar()" class="md:hidden text-slate-400 hover:text-slate-600 p-1">
+              <i data-lucide="x" class="w-4 h-4"></i>
+            </button>
+          </div>
 
           <div onclick="app.switchView('dashboard')" data-nav="dashboard" class="sidebar-nav-item active">
             <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
@@ -610,7 +636,7 @@
         <div id="view-dashboard" class="space-y-6">
           
           <!-- Compact Metrics Row -->
-          <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
             
             <div class="surface-card p-4">
               <div class="flex items-center justify-between text-slate-500 mb-1">
@@ -1250,22 +1276,22 @@
         </div>
 
         <!-- Drawer Scrollable Content -->
-        <div class="flex-1 overflow-y-auto p-6 space-y-5">
+        <div class="flex-1 overflow-y-auto p-4 sm:p-6 space-y-5">
           <div>
-            <h3 id="drawerTitle" class="text-lg font-bold text-slate-900 mb-1">Exhibit Title</h3>
+            <h3 id="drawerTitle" class="text-base sm:text-lg font-bold text-slate-900 mb-1 break-words">Exhibit Title</h3>
             <div class="text-xs text-slate-500 flex items-center gap-2">
-              <i data-lucide="clock" class="w-3.5 h-3.5"></i>
+              <i data-lucide="clock" class="w-3.5 h-3.5 flex-shrink-0"></i>
               <span id="drawerTimestamp">2026-01-15</span>
             </div>
           </div>
 
           <!-- Preview Area -->
-          <div id="drawerPreviewArea" class="bg-slate-50 border border-slate-200 rounded-xl p-4 text-xs font-mono">
+          <div id="drawerPreviewArea" class="bg-slate-50 border border-slate-200 rounded-xl p-3 sm:p-4 text-xs font-mono overflow-x-auto max-h-60 sm:max-h-72">
             <!-- Dynamic preview -->
           </div>
 
           <!-- Parties -->
-          <div class="grid grid-cols-2 gap-3 bg-slate-50 p-3 rounded-lg border border-slate-200 text-xs">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-slate-50 p-3 rounded-lg border border-slate-200 text-xs">
             <div>
               <span class="text-slate-400 block text-[10px] uppercase font-bold">Sender / Originator</span>
               <span id="drawerSender" class="font-semibold text-slate-800">Aisha Khan</span>

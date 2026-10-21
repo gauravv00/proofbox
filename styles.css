@@ -1477,8 +1477,49 @@ textarea.form-input { resize: vertical; min-height: 80px; line-height: 1.6; }
    ============================================================ */
 
 @media (max-width: 768px) {
-  .landing-section { padding: 3rem 1rem; }
-  .formal-demand-letter { padding: 1.5rem; }
+  .landing-section { padding: 2.5rem 1rem; }
+  .formal-demand-letter { padding: 1.25rem 1rem; font-size: 0.8125rem; }
+  .demand-watermark { font-size: 2rem; }
+  
+  /* Timeline responsive alignment */
+  .timeline-container::before {
+    left: 1rem;
+  }
+  
+  .timeline-node {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+
+  /* Make tables horizontally scrollable if needed */
+  .table-responsive {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Modal scaling for small touch screens */
+  .modal-card, .auth-card {
+    max-width: calc(100vw - 1.5rem);
+    margin: 0.75rem auto;
+  }
+
+  /* Button touch target optimization */
+  .btn-primary, .btn-secondary, .sidebar-nav-item {
+    min-height: 2.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .metric-value {
+    font-size: 1.35rem;
+  }
+  
+  .trust-pill {
+    font-size: 0.6875rem;
+    padding: 0.25rem 0.5rem;
+  }
 }
 
 /* ============================================================
