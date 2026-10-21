@@ -81,8 +81,11 @@
         <!-- Login Form -->
         <form id="loginForm" onsubmit="app.submitLogin(event)" class="space-y-4">
           <div class="text-[11px] text-slate-600 bg-blue-50/60 p-2.5 rounded-lg border border-blue-100 flex items-center justify-between">
-            <span>Demo: <strong class="font-mono text-slate-800">aisha@proofbox.app</strong> / <strong class="font-mono text-slate-800">password123</strong></span>
-            <button type="button" onclick="document.getElementById('loginEmail').value='aisha@proofbox.app'; document.getElementById('loginPassword').value='password123';" class="text-[10px] font-bold text-blue-700 hover:underline">Autofill</button>
+            <div>
+              <span class="font-bold text-blue-900 block">All-Access Demo Account:</span>
+              <span class="font-mono text-slate-800">demo@proofboxlaw.in</span> / <span class="font-mono text-slate-800">demo123</span>
+            </div>
+            <button type="button" onclick="document.getElementById('loginEmail').value='demo@proofboxlaw.in'; document.getElementById('loginPassword').value='demo123';" class="text-[10px] font-bold text-blue-700 hover:underline px-2 py-1 bg-white rounded border border-blue-200">Autofill</button>
           </div>
           <div>
             <label class="form-label" for="loginEmail">Email Address</label>
@@ -91,7 +94,7 @@
           <div>
             <div class="flex items-center justify-between mb-1">
               <label class="form-label mb-0" for="loginPassword">Password</label>
-              <button type="button" onclick="app.showToast('Contact administrator or reset database for dev demo.', 'info')" class="text-[11px] text-blue-600 hover:underline">Forgot password?</button>
+              <button type="button" onclick="app.showToast('Use demo account: demo@proofboxlaw.in / demo123', 'info')" class="text-[11px] text-blue-600 hover:underline">Forgot password?</button>
             </div>
             <input id="loginPassword" type="password" required placeholder="Enter password" class="form-input">
           </div>
@@ -130,7 +133,7 @@
         <!-- Try Demo Mode Button -->
         <button type="button" onclick="app.enterDemoMode()" class="btn-secondary w-full py-2.5 text-xs font-semibold flex items-center justify-center gap-2">
           <i data-lucide="play-circle" class="w-4 h-4 text-blue-600"></i>
-          <span>Continue in Demo Mode (No account needed)</span>
+          <span>Instant All-Access Demo (No sign up needed)</span>
         </button>
 
       </div>
@@ -237,53 +240,209 @@
       </div>
     </section>
 
-    <!-- How It Works (3 Steps) -->
+    <!-- How It Works (5-Step Concept) -->
     <section id="landingSteps" class="py-16 bg-slate-50 border-y border-slate-200">
       <div class="max-w-5xl mx-auto px-4 sm:px-6">
         <div class="text-center max-w-xl mx-auto mb-12">
           <h2 class="text-xs font-bold text-blue-600 uppercase tracking-wider mb-2">How It Works</h2>
-          <p class="text-2xl font-bold text-slate-900">Three simple steps to dispute readiness</p>
+          <p class="text-2xl font-bold text-slate-900 font-serif">Five simple steps to dispute readiness</p>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
           
-          <!-- Step 1 -->
-          <div class="surface-card p-6 relative">
-            <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-base mb-4 border border-blue-100">
-              <i data-lucide="upload-cloud" class="w-5 h-5"></i>
+          <!-- Step 01 -->
+          <div class="surface-card p-5 relative flex flex-col justify-between">
+            <div>
+              <div class="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-sm mb-3 border border-blue-100">
+                <i data-lucide="upload-cloud" class="w-4 h-4"></i>
+              </div>
+              <div class="text-[11px] font-bold text-blue-600 font-mono mb-1">01 • CAPTURE</div>
+              <h3 class="text-sm font-bold text-slate-900 mb-1">Capture</h3>
+              <p class="text-xs text-slate-600 leading-relaxed">
+                Import messages, emails, photographs, documents and payments into one case.
+              </p>
             </div>
-            <div class="text-xs font-bold text-blue-600 uppercase tracking-wider mb-1">Step 1</div>
-            <h3 class="text-lg font-bold text-slate-900 mb-2">Collect</h3>
-            <p class="text-sm text-slate-600 leading-relaxed">
-              Upload files, paste chats, log phone calls. Everything gets timestamped and cryptographically hashed automatically.
-            </p>
           </div>
 
-          <!-- Step 2 -->
-          <div class="surface-card p-6 relative">
-            <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-base mb-4 border border-blue-100">
-              <i data-lucide="layers" class="w-5 h-5"></i>
+          <!-- Step 02 -->
+          <div class="surface-card p-5 relative flex flex-col justify-between">
+            <div>
+              <div class="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-sm mb-3 border border-blue-100">
+                <i data-lucide="tag" class="w-4 h-4"></i>
+              </div>
+              <div class="text-[11px] font-bold text-blue-600 font-mono mb-1">02 • ORGANISE</div>
+              <h3 class="text-sm font-bold text-slate-900 mb-1">Organise</h3>
+              <p class="text-xs text-slate-600 leading-relaxed">
+                Every record is typed, categorised and given a legal reference Bates ID.
+              </p>
             </div>
-            <div class="text-xs font-bold text-blue-600 uppercase tracking-wider mb-1">Step 2</div>
-            <h3 class="text-lg font-bold text-slate-900 mb-2">Organise</h3>
-            <p class="text-sm text-slate-600 leading-relaxed">
-              ProofBox builds a chronological evidence timeline and assigns legal Bates exhibit numbers to every record.
-            </p>
           </div>
 
-          <!-- Step 3 -->
-          <div class="surface-card p-6 relative">
-            <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold text-base mb-4 border border-emerald-100">
-              <i data-lucide="download" class="w-5 h-5"></i>
+          <!-- Step 03 -->
+          <div class="surface-card p-5 relative flex flex-col justify-between">
+            <div>
+              <div class="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-sm mb-3 border border-blue-100">
+                <i data-lucide="calendar" class="w-4 h-4"></i>
+              </div>
+              <div class="text-[11px] font-bold text-blue-600 font-mono mb-1">03 • TIMELINE</div>
+              <h3 class="text-sm font-bold text-slate-900 mb-1">Timeline</h3>
+              <p class="text-xs text-slate-600 leading-relaxed">
+                Records are placed in date order, so the sequence tells itself.
+              </p>
             </div>
-            <div class="text-xs font-bold text-emerald-600 uppercase tracking-wider mb-1">Step 3</div>
-            <h3 class="text-lg font-bold text-slate-900 mb-2">Export</h3>
-            <p class="text-sm text-slate-600 leading-relaxed">
-              Generate a Court Evidence Pack or Formal Demand Brief with one click. Complete with exhibits and audit manifest.
-            </p>
+          </div>
+
+          <!-- Step 04 -->
+          <div class="surface-card p-5 relative flex flex-col justify-between">
+            <div>
+              <div class="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center font-bold text-sm mb-3 border border-amber-100">
+                <i data-lucide="alert-circle" class="w-4 h-4"></i>
+              </div>
+              <div class="text-[11px] font-bold text-amber-600 font-mono mb-1">04 • CHECK</div>
+              <h3 class="text-sm font-bold text-slate-900 mb-1">Check</h3>
+              <p class="text-xs text-slate-600 leading-relaxed">
+                Missing record types, unexplained timeline gaps and duplicates are flagged.
+              </p>
+            </div>
+          </div>
+
+          <!-- Step 05 -->
+          <div class="surface-card p-5 relative flex flex-col justify-between">
+            <div>
+              <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold text-sm mb-3 border border-emerald-100">
+                <i data-lucide="package-check" class="w-4 h-4"></i>
+              </div>
+              <div class="text-[11px] font-bold text-emerald-600 font-mono mb-1">05 • PACKAGE</div>
+              <h3 class="text-sm font-bold text-slate-900 mb-1">Package</h3>
+              <p class="text-xs text-slate-600 leading-relaxed">
+                A numbered evidence index with cover sheet, chronology and hash audit.
+              </p>
+            </div>
           </div>
 
         </div>
+      </div>
+    </section>
+
+    <!-- What Makes It Different Section -->
+    <section class="py-16 max-w-5xl mx-auto px-4 sm:px-6">
+      <div class="text-center max-w-xl mx-auto mb-10">
+        <h2 class="text-xs font-bold text-blue-600 uppercase tracking-wider mb-2">What Makes It Different</h2>
+        <p class="text-2xl font-bold text-slate-900 font-serif">The layer before legal intervention</p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+        
+        <!-- Comparison Table -->
+        <div class="surface-card p-6 lg:col-span-2 space-y-4">
+          <div class="overflow-x-auto">
+            <table class="w-full text-xs text-left">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-400 font-mono text-[10px] uppercase">
+                  <th class="pb-2.5">Platform / Tool</th>
+                  <th class="pb-2.5">What It Does</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100 font-medium">
+                <tr>
+                  <td class="py-2.5 font-bold text-slate-800">Legal AI Chatbots</td>
+                  <td class="py-2.5 text-slate-600">Answer legal questions</td>
+                </tr>
+                <tr>
+                  <td class="py-2.5 font-bold text-slate-800">WhatsApp</td>
+                  <td class="py-2.5 text-slate-600">Stores conversations</td>
+                </tr>
+                <tr>
+                  <td class="py-2.5 font-bold text-slate-800">Google Drive</td>
+                  <td class="py-2.5 text-slate-600">Stores unorganized files</td>
+                </tr>
+                <tr>
+                  <td class="py-2.5 font-bold text-slate-800">Notes Apps</td>
+                  <td class="py-2.5 text-slate-600">Record raw information</td>
+                </tr>
+                <tr>
+                  <td class="py-2.5 font-bold text-slate-800">A Lawyer</td>
+                  <td class="py-2.5 text-slate-600">Provides professional legal strategy</td>
+                </tr>
+                <tr class="bg-blue-50/50">
+                  <td class="py-3 font-bold text-blue-700 flex items-center gap-1.5">
+                    <i data-lucide="shield-check" class="w-4 h-4 text-blue-600"></i>
+                    <span>ProofBox</span>
+                  </td>
+                  <td class="py-3 font-bold text-blue-700">Builds the organised, timestamped evidence trail</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="text-xs text-slate-600 italic leading-relaxed pt-2 border-t border-slate-100">
+            Most legal technology answers <strong>"what should I do?"</strong> ProofBox answers <strong>"what happened, and can I prove it?"</strong> - the layer before legal intervention.
+          </p>
+        </div>
+
+        <!-- Ideal User Card -->
+        <div class="surface-card p-6 space-y-4 bg-slate-50/50 border-blue-200">
+          <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider font-mono">IDEAL USER</div>
+            <span class="blue-badge text-[10px]">PREPARED CONSUMER</span>
+          </div>
+
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-blue-600 text-white font-bold flex items-center justify-center text-sm shadow-xs">
+              AK
+            </div>
+            <div>
+              <h4 class="font-bold text-sm text-slate-900">Aisha Khan</h4>
+              <p class="text-[11px] text-slate-500">Age 24 • Young Professional</p>
+            </div>
+          </div>
+
+          <div class="space-y-1.5 text-xs text-slate-600 font-mono">
+            <div class="flex justify-between py-1 border-b border-slate-100">
+              <span class="text-slate-400">INCOME:</span>
+              <span class="font-semibold text-slate-800">Middle income</span>
+            </div>
+            <div class="flex justify-between py-1 border-b border-slate-100">
+              <span class="text-slate-400">TOOLS:</span>
+              <span class="font-semibold text-slate-800 truncate max-w-[140px]">WhatsApp, Gmail, UPI</span>
+            </div>
+            <div class="flex justify-between py-1">
+              <span class="text-slate-400">LEGAL:</span>
+              <span class="font-semibold text-slate-800">Limited knowledge</span>
+            </div>
+          </div>
+
+          <div class="bg-white p-3 rounded-lg border border-slate-200 text-xs text-slate-700 italic">
+            "I know I have proof somewhere, but I don't know where everything is."
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Why Problem is Real Strip -->
+      <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="surface-card p-4 space-y-1.5 border-l-4 border-l-blue-600">
+          <div class="text-xs font-bold text-slate-900">Digital records are recognised evidence</div>
+          <p class="text-[11px] text-slate-600 leading-relaxed">
+            India's Bharatiya Sakshya Adhiniyam, 2023 recognises electronic and digital records as primary evidence.
+          </p>
+        </div>
+        <div class="surface-card p-4 space-y-1.5 border-l-4 border-l-amber-500">
+          <div class="text-xs font-bold text-slate-900">Complaint processes already demand them</div>
+          <p class="text-[11px] text-slate-600 leading-relaxed">
+            Cybercrime and grievance portals ask for contemporaneous screenshots, chat logs, and bank transaction slips.
+          </p>
+        </div>
+        <div class="surface-card p-4 space-y-1.5 border-l-4 border-l-emerald-600">
+          <div class="text-xs font-bold text-slate-900">Consumer forums have moved online</div>
+          <p class="text-[11px] text-slate-600 leading-relaxed">
+            Consumer complaints and notices are increasingly filed digitally with structured documentary evidence attachments.
+          </p>
+        </div>
+      </div>
+
+      <!-- Banner Strip -->
+      <div class="mt-6 bg-slate-900 text-white p-4 rounded-xl text-center text-xs sm:text-sm font-semibold shadow-md">
+        ProofBox doesn't replace your lawyer. It makes sure your lawyer doesn't have to start by searching through your phone.
       </div>
     </section>
 
@@ -369,27 +528,32 @@
       </div>
     </section>
 
-    <!-- Pricing (2 Tiers) -->
-    <section id="landingPricing" class="py-16 max-w-4xl mx-auto px-4 sm:px-6">
-      <div class="text-center max-w-xl mx-auto mb-12">
-        <h2 class="text-xs font-bold text-blue-600 uppercase tracking-wider mb-2">Transparent Pricing</h2>
-        <p class="text-2xl font-bold text-slate-900">Start free. Upgrade only when you need unlimited power.</p>
+    <!-- Pricing (Official Concept Note Business Model) -->
+    <section id="landingPricing" class="py-16 max-w-5xl mx-auto px-4 sm:px-6">
+      <div class="text-center max-w-xl mx-auto mb-4">
+        <h2 class="text-xs font-bold text-blue-600 uppercase tracking-wider mb-2">Business Model</h2>
+        <p class="text-2xl font-bold text-slate-900 font-serif">Transparent dispute pricing</p>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <p class="text-center text-xs text-slate-500 mb-10 max-w-md mx-auto">
+        We do not charge for legal advice. We charge for organisation, preparation and infrastructure.
+      </p>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         
-        <!-- Free Tier -->
-        <div class="surface-card p-6 flex flex-col justify-between">
+        <!-- FREE Tier -->
+        <div class="surface-card p-5 flex flex-col justify-between">
           <div>
-            <h3 class="text-base font-bold text-slate-900 mb-1">Free Plan</h3>
-            <p class="text-xs text-slate-500 mb-4">Everything you need to handle a single dispute.</p>
-            <div class="text-3xl font-bold text-slate-900 mb-6">Rs.0 <span class="text-xs font-normal text-slate-500">/ forever</span></div>
+            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider font-mono mb-1">FREE</div>
+            <h3 class="text-base font-bold text-slate-900 mb-1">Free Tier</h3>
+            <p class="text-xs text-slate-500 mb-4">1 case, limited storage.</p>
+            <div class="text-3xl font-bold text-slate-900 mb-4 font-mono">₹0</div>
             
-            <ul class="space-y-3 text-xs text-slate-600 mb-6">
-              <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-emerald-600"></i> 1 active dispute case</li>
-              <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-emerald-600"></i> Up to 20 timestamped exhibits</li>
-              <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-emerald-600"></i> SHA-256 integrity verification</li>
-              <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-emerald-600"></i> Basic JSON export</li>
+            <ul class="space-y-2.5 text-xs text-slate-600 mb-6">
+              <li class="flex items-center gap-2"><i data-lucide="check" class="w-3.5 h-3.5 text-emerald-600"></i> 1 active case</li>
+              <li class="flex items-center gap-2"><i data-lucide="check" class="w-3.5 h-3.5 text-emerald-600"></i> Limited cloud storage</li>
+              <li class="flex items-center gap-2"><i data-lucide="check" class="w-3.5 h-3.5 text-emerald-600"></i> Automatic timestamping</li>
+              <li class="flex items-center gap-2"><i data-lucide="check" class="w-3.5 h-3.5 text-emerald-600"></i> SHA-256 integrity hash</li>
             </ul>
           </div>
           <button onclick="app.showAuthModal('register')" class="btn-secondary w-full text-xs">
@@ -397,26 +561,66 @@
           </button>
         </div>
 
-        <!-- Pro Tier -->
-        <div class="surface-card p-6 border-blue-600 shadow-md flex flex-col justify-between relative overflow-hidden">
-          <div class="absolute top-3 right-3">
-            <span class="blue-badge font-bold">RECOMMENDED</span>
+        <!-- PREMIUM Tier -->
+        <div class="surface-card p-5 border-blue-500 shadow-md flex flex-col justify-between relative overflow-hidden bg-blue-50/10">
+          <div class="absolute top-2.5 right-2.5">
+            <span class="blue-badge text-[9px] font-bold">POPULAR</span>
           </div>
           <div>
-            <h3 class="text-base font-bold text-slate-900 mb-1">Pro Plan</h3>
-            <p class="text-xs text-slate-500 mb-4">For active freelancers and complex claims.</p>
-            <div class="text-3xl font-bold text-blue-600 mb-6">Rs.299 <span class="text-xs font-normal text-slate-500">/ month</span></div>
+            <div class="text-[10px] font-bold text-blue-600 uppercase tracking-wider font-mono mb-1">PREMIUM</div>
+            <h3 class="text-base font-bold text-slate-900 mb-1">Premium Plan</h3>
+            <p class="text-xs text-slate-500 mb-4">Unlimited cases, advanced organisation.</p>
+            <div class="text-2xl font-bold text-blue-600 mb-4 font-mono">₹99 - 199 <span class="text-[11px] font-normal text-slate-500">/ mo</span></div>
 
-            <ul class="space-y-3 text-xs text-slate-600 mb-6">
-              <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-blue-600"></i> Unlimited active cases</li>
-              <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-blue-600"></i> Unlimited exhibits & file uploads</li>
-              <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-blue-600"></i> Full Court Evidence ZIP pack</li>
-              <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-blue-600"></i> Formal Demand Brief generator</li>
-              <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-blue-600"></i> Priority email support</li>
+            <ul class="space-y-2.5 text-xs text-slate-600 mb-6">
+              <li class="flex items-center gap-2"><i data-lucide="check" class="w-3.5 h-3.5 text-blue-600"></i> Unlimited dispute cases</li>
+              <li class="flex items-center gap-2"><i data-lucide="check" class="w-3.5 h-3.5 text-blue-600"></i> Advanced categorization</li>
+              <li class="flex items-center gap-2"><i data-lucide="check" class="w-3.5 h-3.5 text-blue-600"></i> Chronological timeline gaps</li>
+              <li class="flex items-center gap-2"><i data-lucide="check" class="w-3.5 h-3.5 text-blue-600"></i> Unlimited exhibits & chats</li>
             </ul>
           </div>
           <button onclick="app.showAuthModal('register')" class="btn-primary w-full text-xs">
-            Upgrade to Pro
+            Choose Premium
+          </button>
+        </div>
+
+        <!-- EVIDENCE PACKAGE -->
+        <div class="surface-card p-5 flex flex-col justify-between border-amber-300 bg-amber-50/10">
+          <div>
+            <div class="text-[10px] font-bold text-amber-600 uppercase tracking-wider font-mono mb-1">EVIDENCE PACKAGE</div>
+            <h3 class="text-base font-bold text-slate-900 mb-1">One-Time Pack</h3>
+            <p class="text-xs text-slate-500 mb-4">Organised, shareable evidence file.</p>
+            <div class="text-2xl font-bold text-amber-600 mb-4 font-mono">₹499 - 999 <span class="text-[11px] font-normal text-slate-500">/ pack</span></div>
+
+            <ul class="space-y-2.5 text-xs text-slate-600 mb-6">
+              <li class="flex items-center gap-2"><i data-lucide="check" class="w-3.5 h-3.5 text-amber-600"></i> Bates-numbered PDF pack</li>
+              <li class="flex items-center gap-2"><i data-lucide="check" class="w-3.5 h-3.5 text-amber-600"></i> Formal Demand Brief</li>
+              <li class="flex items-center gap-2"><i data-lucide="check" class="w-3.5 h-3.5 text-amber-600"></i> Court-ready ZIP archive</li>
+              <li class="flex items-center gap-2"><i data-lucide="check" class="w-3.5 h-3.5 text-amber-600"></i> Cryptographic audit sheet</li>
+            </ul>
+          </div>
+          <button onclick="app.enterDemoMode()" class="btn-secondary w-full text-xs">
+            Preview Pack
+          </button>
+        </div>
+
+        <!-- PROFESSIONAL -->
+        <div class="surface-card p-5 flex flex-col justify-between">
+          <div>
+            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider font-mono mb-1">PROFESSIONAL</div>
+            <h3 class="text-base font-bold text-slate-900 mb-1">Lawyers & NGOs</h3>
+            <p class="text-xs text-slate-500 mb-4">Law firms, legal aid clinics, NGOs.</p>
+            <div class="text-2xl font-bold text-slate-900 mb-4 font-mono">Custom</div>
+
+            <ul class="space-y-2.5 text-xs text-slate-600 mb-6">
+              <li class="flex items-center gap-2"><i data-lucide="check" class="w-3.5 h-3.5 text-emerald-600"></i> Multi-client workspace</li>
+              <li class="flex items-center gap-2"><i data-lucide="check" class="w-3.5 h-3.5 text-emerald-600"></i> White-label export covers</li>
+              <li class="flex items-center gap-2"><i data-lucide="check" class="w-3.5 h-3.5 text-emerald-600"></i> Team collaboration</li>
+              <li class="flex items-center gap-2"><i data-lucide="check" class="w-3.5 h-3.5 text-emerald-600"></i> Dedicated legal support</li>
+            </ul>
+          </div>
+          <button onclick="app.showToast('Please email partners@proofboxlaw.in for institutional licensing.', 'info')" class="btn-secondary w-full text-xs">
+            Contact Sales
           </button>
         </div>
 

@@ -83,4 +83,32 @@ db.exec(`
   CREATE INDEX IF NOT EXISTS idx_claims_case ON claims(case_id);
 `);
 
+// Seed default All-Access demo user: demo@proofboxlaw.in / demo123
+try {
+  const existingDemo = db.prepare('SELECT id FROM users WHERE email = ?').get('demo@proofboxlaw.in');
+  if (!existingDemo) {
+    const bcrypt = require('bcryptjs');
+    const salt = bcrypt.genSaltSync(10);
+    const hash = bcrypt.hashSync('demo123', salt);
+    db.prepare(`
+      INSERT INTO users (id, email, name, password_hash, plan, created_at)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `).run('user-demo-all-access', 'demo@proofboxlaw.in', 'Aisha Khan (Full Demo)', hash, 'professional', new Date().toISOString());
+  }
+
+  // Also maintain backwards compatibility for aisha@proofbox.app / password123
+  const existingAisha = db.prepare('SELECT id FROM users WHERE email = ?').get('aisha@proofbox.app');
+  if (!existingAisha) {
+    const bcrypt = require('bcryptjs');
+    const salt = bcrypt.genSaltSync(10);
+    const hash = bcrypt.hashSync('password123', salt);
+    db.prepare(`
+      INSERT INTO users (id, email, name, password_hash, plan, created_at)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `).run('user-demo-001', 'aisha@proofbox.app', 'Aisha Khan', hash, 'pro', new Date().toISOString());
+  }
+} catch (e) {
+  console.warn('Seeding demo accounts error:', e.message);
+}
+
 module.exports = db;
