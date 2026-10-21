@@ -933,11 +933,11 @@ class ProofBoxApp {
           <div class="mt-0.5 flex-shrink-0">
             <i data-lucide="${hasMatch ? 'check-circle' : 'circle'}" class="w-4 h-4 ${hasMatch ? 'text-emerald-500' : 'text-slate-500'}"></i>
           </div>
-          <div class="flex-1 min-w-0">
-            <div class="text-xs readiness-title">${this.escapeHtml(item.title)}</div>
-            <div class="text-[11px] readiness-desc truncate mt-0.5">${this.escapeHtml(item.description)}</div>
+          <div class="flex-1 min-w-0 pr-1">
+            <div class="text-xs readiness-title font-semibold truncate">${this.escapeHtml(item.title)}</div>
+            <div class="text-[11px] readiness-desc line-clamp-1 mt-0.5">${this.escapeHtml(item.description)}</div>
           </div>
-          <span class="text-[10px] font-mono uppercase px-1.5 py-0.5 rounded flex-shrink-0 readiness-badge">${this.escapeHtml(item.requiredCategory)}</span>
+          <span class="text-[9px] sm:text-[10px] font-mono uppercase px-1.5 py-0.5 rounded flex-shrink-0 self-start readiness-badge">${this.escapeHtml(item.requiredCategory)}</span>
         </div>
       `;
     }).join('');
