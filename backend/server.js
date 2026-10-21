@@ -1,3 +1,16 @@
+// Load .env file if present (zero-dependency)
+try {
+  require('fs').readFileSync(require('path').join(__dirname,'..', '.env'), 'utf8')
+    .split('\n').forEach(line => {
+      const eq = line.indexOf('=');
+      if (eq > 0 && !line.trim().startsWith('#')) {
+        const k = line.slice(0, eq).trim();
+        const v = line.slice(eq + 1).trim();
+        if (k && !process.env[k]) process.env[k] = v;
+      }
+    });
+} catch (_) {}
+
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
@@ -9,6 +22,7 @@ const { router: casesRoutes } = require('./routes/cases');
 const exhibitsRoutes = require('./routes/exhibits');
 const claimsRoutes = require('./routes/claims');
 const exportRoutes = require('./routes/export');
+const chatRoutes   = require('./routes/chat');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -39,6 +53,7 @@ app.use('/api/cases', casesRoutes);
 app.use('/api', exhibitsRoutes);
 app.use('/api', claimsRoutes);
 app.use('/api', exportRoutes);
+app.use('/api/chat', chatRoutes);
 
 // Serve frontend static files from proofbox root
 const rootDir = path.join(__dirname, '..');

@@ -759,10 +759,10 @@
     <div class="flex-1 flex overflow-hidden relative">
       
       <!-- Mobile Sidebar Backdrop Overlay -->
-      <div id="mobileSidebarBackdrop" onclick="app.closeMobileSidebar()" class="hidden md:hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-40 transition-opacity"></div>
+      <div id="mobileSidebarBackdrop" onclick="app.closeMobileSidebar()" class="hidden fixed inset-0 z-40 transition-opacity"></div>
 
       <!-- Sidebar (240px desktop, sliding drawer on mobile) -->
-      <aside id="workspaceSidebar" class="w-60 bg-white border-r border-slate-200 flex flex-col justify-between flex-shrink-0 select-none fixed md:static inset-y-0 left-0 z-40 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out">
+      <aside id="workspaceSidebar" class="w-60 bg-white border-r border-slate-200 flex flex-col justify-between flex-shrink-0 select-none fixed md:static top-0 md:top-auto left-0 bottom-0 md:bottom-auto z-50 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out">
         
         <!-- Navigation Links -->
         <div class="p-3 space-y-1 overflow-y-auto">
@@ -1746,6 +1746,68 @@
 
   <!-- Toast Notification Container -->
   <div id="toastContainer"></div>
+
+  <!-- ============================================================ -->
+  <!-- LEGAL AI CHATBOT WIDGET                                      -->
+  <!-- ============================================================ -->
+
+  <!-- Floating Toggle Button -->
+  <button id="chatbotToggleBtn" onclick="chatbot.toggle()" title="Legal Assistant" aria-label="Open Legal Assistant">
+    <i data-lucide="message-circle" class="w-6 h-6" id="chatbotToggleIcon"></i>
+  </button>
+
+  <!-- Chatbot Panel -->
+  <div id="chatbotPanel" class="hidden">
+
+    <!-- Panel Header -->
+    <div class="flex items-center justify-between px-4 py-3 flex-shrink-0" style="background:var(--bg-elevated); border-bottom:1px solid var(--border-subtle);">
+      <div class="flex items-center gap-2.5">
+        <div class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0" style="background:var(--accent-bg); border:1px solid var(--accent-border);">
+          <i data-lucide="scale" class="w-4 h-4" style="color:var(--accent);"></i>
+        </div>
+        <div>
+          <div class="text-sm font-bold" style="color:var(--text-primary); font-family:'Playfair Display',serif;">Legal Assistant</div>
+          <div class="text-[10px]" style="color:var(--text-muted);">Evidence guidance - scope limited</div>
+        </div>
+      </div>
+      <button onclick="chatbot.toggle()" class="p-1.5 rounded-lg transition" style="color:var(--text-muted);" onmouseover="this.style.background='var(--bg-surface)'" onmouseout="this.style.background='transparent'">
+        <i data-lucide="x" class="w-4 h-4"></i>
+      </button>
+    </div>
+
+    <!-- Disclaimer Banner -->
+    <div class="px-4 py-2 flex-shrink-0" style="background:var(--financial-bg); border-bottom:1px solid var(--financial-border);">
+      <p class="text-[10px] leading-tight" style="color:var(--financial);">
+        <strong>Information only - not legal advice.</strong> Consult a qualified lawyer for your specific situation.
+      </p>
+    </div>
+
+    <!-- Messages Area -->
+    <div id="chatbotMessages"></div>
+
+    <!-- Input Area -->
+    <div id="chatbotInputArea">
+      <div class="flex gap-2 items-end">
+        <textarea id="chatbotInput"
+          placeholder="Ask about evidence, tenant rights, payment disputes..."
+          rows="1"
+          class="form-input text-xs flex-1 resize-none"
+          style="min-height:38px; max-height:80px; padding:0.5rem 0.75rem;"
+          onkeydown="chatbot.onKeyDown(event)"
+          oninput="this.style.height='auto'; this.style.height=Math.min(this.scrollHeight,80)+'px'"
+        ></textarea>
+        <button onclick="chatbot.sendMessage()" id="chatbotSendBtn"
+          class="btn-primary flex-shrink-0 rounded-lg flex items-center justify-center"
+          style="height:38px; width:38px; padding:0;">
+          <i data-lucide="send" class="w-4 h-4"></i>
+        </button>
+      </div>
+      <div class="mt-1.5 flex items-center gap-1">
+        <i data-lucide="zap" class="w-2.5 h-2.5" style="color:var(--text-faint);"></i>
+        <span class="text-[9px]" style="color:var(--text-faint);">Powered by Gemini - Legal scope only</span>
+      </div>
+    </div>
+  </div>
 
   <!-- Application Logic Scripts -->
   <script src="data.js"></script>

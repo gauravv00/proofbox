@@ -325,25 +325,33 @@ class ProofBoxApp {
   }
 
   toggleMobileSidebar() {
-    const sidebar = document.getElementById('workspaceSidebar');
+    const sidebar  = document.getElementById('workspaceSidebar');
     const backdrop = document.getElementById('mobileSidebarBackdrop');
-    if (sidebar) {
-      const isClosed = sidebar.classList.contains('-translate-x-full');
-      if (isClosed) {
-        sidebar.classList.remove('-translate-x-full');
-        if (backdrop) backdrop.classList.remove('hidden');
-      } else {
-        sidebar.classList.add('-translate-x-full');
-        if (backdrop) backdrop.classList.add('hidden');
+    if (!sidebar) return;
+    const isOpen = !sidebar.classList.contains('-translate-x-full');
+    if (isOpen) {
+      sidebar.classList.add('-translate-x-full');
+      if (backdrop) {
+        backdrop.classList.remove('sidebar-backdrop-open');
+        setTimeout(() => backdrop.classList.add('hidden'), 300);
+      }
+    } else {
+      sidebar.classList.remove('-translate-x-full');
+      if (backdrop) {
+        backdrop.classList.remove('hidden');
+        requestAnimationFrame(() => backdrop.classList.add('sidebar-backdrop-open'));
       }
     }
   }
 
   closeMobileSidebar() {
-    const sidebar = document.getElementById('workspaceSidebar');
+    const sidebar  = document.getElementById('workspaceSidebar');
     const backdrop = document.getElementById('mobileSidebarBackdrop');
-    if (sidebar) sidebar.classList.add('-translate-x-full');
-    if (backdrop) backdrop.classList.add('hidden');
+    if (sidebar)  sidebar.classList.add('-translate-x-full');
+    if (backdrop) {
+      backdrop.classList.remove('sidebar-backdrop-open');
+      setTimeout(() => backdrop.classList.add('hidden'), 300);
+    }
   }
 
   switchView(viewName) {
@@ -2178,3 +2186,196 @@ class ProofBoxApp {
 document.addEventListener('DOMContentLoaded', () => {
   window.app = new ProofBoxApp();
 });
+
+/* ================================================================
+   PROOFBOX LEGAL CHATBOT - Gemini-powered, legally constrained
+   ================================================================ */
+
+class ProofBoxChatbot {
+  constructor() {
+    this.isOpen    = false;
+    this.history   = [];   // [{role:'user'|'model', text:'...'}]
+    this.isLoading = false;
+    this.initialized = false;
+  }
+
+  toggle() {
+    this.isOpen = !this.isOpen;
+    const panel = document.getElementById('chatbotPanel');
+    const icon  = document.getElementById('chatbotToggleIcon');
+    if (!panel) return;
+
+    if (this.isOpen) {
+      panel.classList.remove('hidden');
+      if (!this.initialized) { this.initialized = true; this._renderWelcome(); }
+      setTimeout(() => {
+        const inp = document.getElementById('chatbotInput');
+        if (inp) inp.focus();
+        this._scrollBottom();
+      }, 80);
+      if (icon) icon.setAttribute('data-lucide', 'x');
+    } else {
+      panel.classList.add('hidden');
+      if (icon) icon.setAttribute('data-lucide', 'message-circle');
+    }
+    if (window.lucide) lucide.createIcons();
+  }
+
+  _renderWelcome() {
+    const c = document.getElementById('chatbotMessages');
+    if (!c) return;
+    const suggestions = [
+      'How do I build a strong tenancy dispute case?',
+      'What evidence do I need for an unpaid invoice?',
+      'Can WhatsApp messages be used as evidence?',
+      'How does Bates numbering work?'
+    ];
+    c.innerHTML = `
+      <div class="chatbot-msg-bot">
+        <div class="chatbot-bubble-bot">
+          <p style="color:var(--text-primary);">Hello. I am the ProofBox Legal Assistant. I can guide you on evidence collection, tenant rights, consumer disputes, and how to use ProofBox effectively.</p>
+          <p style="color:var(--text-secondary); margin-top:0.5rem;">What would you like to know?</p>
+        </div>
+      </div>
+      <div style="display:flex; flex-wrap:wrap; gap:0.375rem; margin-top:0.5rem;">
+        ${suggestions.map(s => `<button class="chatbot-suggestion" onclick="chatbot._sendSuggestion(this)" data-text="${s.replace(/"/g,'&quot;')}">${s}</button>`).join('')}
+      </div>
+    `;
+    if (window.lucide) lucide.createIcons();
+  }
+
+  _sendSuggestion(btn) {
+    const text = btn.getAttribute('data-text');
+    if (!text) return;
+    const inp = document.getElementById('chatbotInput');
+    if (inp) inp.value = text;
+    this.sendMessage();
+  }
+
+  onKeyDown(e) {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); this.sendMessage(); }
+  }
+
+  async sendMessage() {
+    if (this.isLoading) return;
+    const inp = document.getElementById('chatbotInput');
+    if (!inp) return;
+    const text = inp.value.trim();
+    if (!text) return;
+
+    inp.value = '';
+    inp.style.height = 'auto';
+    this._addMsg('user', text);
+    this.history.push({ role: 'user', text });
+
+    this.isLoading = true;
+    this._setDisabled(true);
+    const typingId = this._addTyping();
+
+    try {
+      const token = localStorage.getItem('proofbox_token_v1');
+      const headers = { 'Content-Type': 'application/json' };
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ message: text, history: this.history.slice(-8) })
+      });
+
+      this._removeTyping(typingId);
+
+      if (!res.ok) {
+        const d = await res.json().catch(() => ({}));
+        throw new Error(d.error || `Server error ${res.status}`);
+      }
+
+      const data = await res.json();
+      const reply = (data.data && data.data.reply) || '';
+      if (!reply) throw new Error('Empty response. Please try again.');
+
+      this._addMsg('bot', reply);
+      this.history.push({ role: 'model', text: reply });
+      if (this.history.length > 20) this.history = this.history.slice(-16);
+
+    } catch (err) {
+      this._removeTyping(typingId);
+      this._addMsg('error', err.message || 'Something went wrong. Please try again.');
+    } finally {
+      this.isLoading = false;
+      this._setDisabled(false);
+      const i = document.getElementById('chatbotInput');
+      if (i) i.focus();
+    }
+  }
+
+  _addMsg(role, text) {
+    const c = document.getElementById('chatbotMessages');
+    if (!c) return;
+    const id  = 'cm-' + Date.now();
+    const div = document.createElement('div');
+    div.id    = id;
+
+    const safe = this._esc(text)
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\n\n/g, '<br><br>')
+      .replace(/\n/g, '<br>');
+
+    if (role === 'user') {
+      div.className = 'chatbot-msg-user';
+      div.innerHTML = `<div class="chatbot-bubble-user"><p>${safe}</p></div>`;
+    } else if (role === 'bot') {
+      div.className = 'chatbot-msg-bot';
+      div.innerHTML = `<div class="chatbot-bubble-bot"><p style="color:var(--text-primary);">${safe}</p></div>`;
+    } else {
+      div.className = 'chatbot-msg-error';
+      div.innerHTML = `<div class="chatbot-bubble-error"><span>${safe}</span></div>`;
+    }
+
+    c.appendChild(div);
+    if (window.lucide) lucide.createIcons();
+    this._scrollBottom();
+    return id;
+  }
+
+  _addTyping() {
+    const c = document.getElementById('chatbotMessages');
+    if (!c) return null;
+    const id  = 'ctyp-' + Date.now();
+    const div = document.createElement('div');
+    div.id    = id;
+    div.className = 'chatbot-msg-bot';
+    div.innerHTML = `<div class="chatbot-bubble-bot" style="padding:0.625rem 0.875rem;">
+      <span class="chatbot-dot"></span>
+      <span class="chatbot-dot" style="animation-delay:0.15s"></span>
+      <span class="chatbot-dot" style="animation-delay:0.30s"></span>
+    </div>`;
+    c.appendChild(div);
+    this._scrollBottom();
+    return id;
+  }
+
+  _removeTyping(id) {
+    if (id) { const el = document.getElementById(id); if (el) el.remove(); }
+  }
+
+  _setDisabled(v) {
+    const inp = document.getElementById('chatbotInput');
+    const btn = document.getElementById('chatbotSendBtn');
+    if (inp) inp.disabled = v;
+    if (btn) btn.disabled = v;
+  }
+
+  _scrollBottom() {
+    const c = document.getElementById('chatbotMessages');
+    if (c) c.scrollTop = c.scrollHeight;
+  }
+
+  _esc(s) {
+    return String(s)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  }
+}
+
+window.chatbot = new ProofBoxChatbot();
