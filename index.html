@@ -839,6 +839,21 @@
         <!-- VIEW: DASHBOARD -->
         <div id="view-dashboard" class="space-y-6">
           
+          <!-- Empty State when user has 0 cases -->
+          <div id="dashEmptyCaseState" class="hidden surface-card p-6 border-dashed border-2 text-center space-y-3">
+            <div class="w-12 h-12 rounded-full mx-auto flex items-center justify-center" style="background: var(--accent-bg); border: 1px solid var(--accent-border);">
+              <i data-lucide="folder-plus" class="w-6 h-6" style="color: var(--accent);"></i>
+            </div>
+            <div>
+              <h3 class="text-base font-bold text-slate-900">No Dispute Cases Yet</h3>
+              <p class="text-xs text-slate-500 max-w-md mx-auto mt-1">Create your first case to organize evidence, generate timelines, and calculate claim amounts.</p>
+            </div>
+            <button onclick="app.openNewCaseModal()" class="btn-primary inline-flex items-center gap-2 py-2 px-4 text-xs font-semibold mx-auto">
+              <i data-lucide="plus" class="w-4 h-4"></i>
+              <span>Create Your First Case</span>
+            </button>
+          </div>
+          
           <!-- Compact Metrics Row (2x2 on mobile, 4 across on desktop) -->
           <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
             

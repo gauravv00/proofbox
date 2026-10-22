@@ -284,8 +284,13 @@ class ProofBoxApp {
 
     const demoBanner = document.getElementById('demoModeBanner');
     if (demoBanner) {
-      if (this.isDemoMode) demoBanner.classList.remove('hidden');
-      else demoBanner.classList.add('hidden');
+      if (this.isDemoMode) {
+        demoBanner.classList.remove('hidden');
+        demoBanner.style.display = 'flex';
+      } else {
+        demoBanner.classList.add('hidden');
+        demoBanner.style.display = 'none';
+      }
     }
 
     const userNameEl = document.getElementById('userNameDisplay');
@@ -501,13 +506,6 @@ class ProofBoxApp {
         this.isDemoMode = false;
         this.hideAuthModal();
 
-        // Seed demo case for new user convenience
-        try {
-          await window.proofboxAPI.seedDemoCase();
-        } catch {
-          // If seeding fails, proceed anyway
-        }
-
         await this.loadUserData();
         this.showToast(`Account created! Welcome, ${this.user.name}.`, 'success');
       } else {
@@ -569,18 +567,13 @@ class ProofBoxApp {
       const res = await window.proofboxAPI.getCases();
       this.cases = (res && res.data) || [];
 
-      if (this.cases.length === 0) {
-        // Automatically seed demo case if brand new user with 0 cases
-        const seedRes = await window.proofboxAPI.seedDemoCase();
-        if (seedRes && seedRes.data) {
-          this.cases = [seedRes.data];
-        }
-      }
-
       if (this.cases.length > 0) {
-        await this.setActiveCase(this.cases[0].id);
+        // Retain currently selected case if it still exists; otherwise default to first case
+        const found = this.cases.find(c => c.id === this.activeCaseId);
+        await this.setActiveCase(found ? found.id : this.cases[0].id);
       } else {
-        this.activeCase = { id: null, title: 'No Cases Found', exhibits: [], claims: [] };
+        this.activeCaseId = null;
+        this.activeCase = null;
       }
 
       this.showWorkspace();
@@ -642,6 +635,7 @@ class ProofBoxApp {
   }
 
   renderHeaderMeta() {
+    const hasCases = Boolean(this.cases && this.cases.length > 0 && this.activeCase && this.activeCase.id);
     const c = this.getActiveCase();
     const headerTitle = document.getElementById('headerCaseTitle');
     const metaDispute = document.getElementById('metaDisputeType');
@@ -649,8 +643,21 @@ class ProofBoxApp {
     const metaPrefix = document.getElementById('metaBatesPrefix');
     const metaOpposing = document.getElementById('metaOpposingParty');
     const metaClaim = document.getElementById('metaClaimAmount');
+    const statusBar = document.getElementById('subHeaderStatusBar');
 
-    if (headerTitle) headerTitle.textContent = c.title || 'Untitled Case';
+    if (statusBar) {
+      if (hasCases) {
+        statusBar.classList.remove('hidden');
+        statusBar.style.display = '';
+      } else {
+        statusBar.classList.add('hidden');
+        statusBar.style.display = 'none';
+      }
+    }
+
+    if (headerTitle) {
+      headerTitle.textContent = hasCases ? (c.title || 'Untitled Case') : 'No Cases - Click to Create';
+    }
     if (metaDispute) metaDispute.textContent = c.disputeType || c.dispute_type || 'Dispute';
     if (metaStatus) metaStatus.textContent = c.status || 'Active File';
     if (metaPrefix) metaPrefix.textContent = c.batesPrefix || c.bates_prefix || 'PB-';
@@ -679,23 +686,45 @@ class ProofBoxApp {
     if (!container) return;
 
     if (!this.cases || this.cases.length === 0) {
-      container.innerHTML = '<div class="text-xs text-slate-400 p-2">No cases found.</div>';
+      container.innerHTML = `
+        <div class="text-xs text-slate-400 p-3 text-center rounded-lg bg-slate-500/5">
+          No cases found. Click "Create New Case" below.
+        </div>
+      `;
+      if (window.lucide) lucide.createIcons();
       return;
     }
 
-    container.innerHTML = this.cases.map(c => `
-      <div onclick="app.selectCase('${c.id}')" class="p-2 rounded-lg cursor-pointer transition flex items-center justify-between ${c.id === this.activeCaseId ? 'bg-blue-50 border border-blue-200 text-blue-900 font-semibold' : 'hover:bg-slate-100 text-slate-700'}">
-        <div class="truncate mr-2">
-          <div class="text-xs truncate">${this.escapeHtml(c.title)}</div>
-          <div class="text-[10px] text-slate-500 font-mono flex items-center gap-2 mt-0.5">
-            <span>${c.exhibitCount || (c.exhibits ? c.exhibits.length : 0)} exhibits</span>
-            <span>•</span>
-            <span>${c.batesPrefix || c.bates_prefix || 'PB-'}</span>
+    container.innerHTML = this.cases.map(c => {
+      const isActive = c.id === this.activeCaseId;
+      const count = c.exhibitCount || (c.exhibits ? c.exhibits.length : 0);
+      const prefix = c.batesPrefix || c.bates_prefix || 'PB-';
+      const titleEscaped = this.escapeHtml(c.title || 'Untitled Case');
+      const safeCaseTitle = titleEscaped.replace(/'/g, "\\'");
+
+      return `
+        <div onclick="app.selectCase('${c.id}')" class="p-2 rounded-lg cursor-pointer transition flex items-center justify-between group ${
+          isActive
+            ? 'bg-teal-500/15 border border-teal-500/35 text-teal-300 font-semibold shadow-xs'
+            : 'hover:bg-white/5 border border-transparent text-slate-200'
+        }">
+          <div class="truncate mr-2 flex-1 min-w-0">
+            <div class="text-xs truncate ${isActive ? 'text-teal-300 font-bold' : 'text-slate-200 group-hover:text-white'}">${titleEscaped}</div>
+            <div class="text-[10px] text-slate-400 font-mono flex items-center gap-1.5 mt-0.5">
+              <span>${count} exhibits</span>
+              <span>•</span>
+              <span>${prefix}</span>
+            </div>
+          </div>
+          <div class="flex items-center gap-1 flex-shrink-0">
+            ${isActive ? '<i data-lucide="check" class="w-3.5 h-3.5 text-teal-400 mr-1 flex-shrink-0"></i>' : ''}
+            <button type="button" onclick="event.stopPropagation(); app.deleteCaseDirect('${c.id}', '${safeCaseTitle}')" title="Delete Case" class="p-1 rounded text-slate-400 hover:text-rose-400 hover:bg-rose-500/15 transition flex-shrink-0">
+              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+            </button>
           </div>
         </div>
-        ${c.id === this.activeCaseId ? '<i data-lucide="check" class="w-3.5 h-3.5 text-blue-600 flex-shrink-0"></i>' : ''}
-      </div>
-    `).join('');
+      `;
+    }).join('');
 
     if (window.lucide) lucide.createIcons();
   }
@@ -877,9 +906,54 @@ class ProofBoxApp {
     }
   }
 
+  async deleteCaseDirect(caseId, caseTitle) {
+    if (!caseId) return;
+    const cleanTitle = caseTitle || 'this case';
+    if (!confirm(`Are you sure you want to permanently delete case "${cleanTitle}" and all its exhibits?`)) {
+      return;
+    }
+
+    if (this.isDemoMode) {
+      this.cases = this.cases.filter(x => x.id !== caseId);
+      if (this.activeCaseId === caseId) {
+        if (this.cases.length > 0) {
+          await this.setActiveCase(this.cases[0].id);
+        } else {
+          this.activeCase = null;
+          this.activeCaseId = null;
+        }
+      }
+      this.renderAll();
+      this.showToast('Case deleted (Demo Mode).', 'info');
+      return;
+    }
+
+    try {
+      this.setLoading(true);
+      await window.proofboxAPI.deleteCase(caseId);
+      this.showToast('Case deleted.', 'info');
+      await this.loadUserData();
+    } catch (err) {
+      console.error('Failed to delete case:', err);
+      this.showToast('Failed to delete case: ' + err.message, 'error');
+    } finally {
+      this.setLoading(false);
+    }
+  }
+
   /* ================= DASHBOARD VIEW ================= */
 
   renderDashboard() {
+    const hasCases = Boolean(this.cases && this.cases.length > 0 && this.activeCase && this.activeCase.id);
+    const emptyStateEl = document.getElementById('dashEmptyCaseState');
+    if (emptyStateEl) {
+      if (hasCases) {
+        emptyStateEl.classList.add('hidden');
+      } else {
+        emptyStateEl.classList.remove('hidden');
+      }
+    }
+
     const c = this.getActiveCase();
     const exhibits = c.exhibits || [];
     const claims = c.claims || [];
